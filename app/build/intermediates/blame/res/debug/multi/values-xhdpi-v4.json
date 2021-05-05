@@ -1,0 +1,45 @@
+[
+    {
+        "outputFile": "C:\\Users\\EARTH\\Google Drive\\Kibo-RPC 2021\\Code\\DefaultApk\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-xhdpi-v4\\values-xhdpi-v4.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 55,
+                    "endColumn": 57,
+                    "endOffset": 108
+                },
+                "from": {
+                    "file": "C:\\Users\\EARTH\\.android\\build-cache\\1a686e434cad3f2a61677a74fcf63313bcae3da6\\output\\res\\values-xhdpi-v4\\values-xhdpi-v4.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 55,
+                        "endColumn": 57,
+                        "endOffset": 108
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 113,
+                    "endColumn": 55,
+                    "endOffset": 164
+                },
+                "from": {
+                    "file": "C:\\Users\\EARTH\\.android\\build-cache\\1a686e434cad3f2a61677a74fcf63313bcae3da6\\output\\res\\values-xhdpi-v4\\values-xhdpi-v4.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 113,
+                        "endColumn": 55,
+                        "endOffset": 164
+                    }
+                }
+            }
+        ]
+    }
+]

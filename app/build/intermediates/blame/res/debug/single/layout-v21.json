@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "C:\\Users\\EARTH\\Google Drive\\Kibo-RPC 2021\\Code\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\layout-v21\\notification_template_icon_group.xml",
+        "source": "C:\\Users\\EARTH\\.android\\build-cache\\ffb58c8c10b43515261d86446df6d076d514d933\\output\\res\\layout-v21\\notification_template_icon_group.xml"
+    },
+    {
+        "merged": "C:\\Users\\EARTH\\Google Drive\\Kibo-RPC 2021\\Code\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\layout-v21\\notification_template_custom_big.xml",
+        "source": "C:\\Users\\EARTH\\.android\\build-cache\\ffb58c8c10b43515261d86446df6d076d514d933\\output\\res\\layout-v21\\notification_template_custom_big.xml"
+    },
+    {
+        "merged": "C:\\Users\\EARTH\\Google Drive\\Kibo-RPC 2021\\Code\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\layout-v21\\notification_action_tombstone.xml",
+        "source": "C:\\Users\\EARTH\\.android\\build-cache\\ffb58c8c10b43515261d86446df6d076d514d933\\output\\res\\layout-v21\\notification_action_tombstone.xml"
+    },
+    {
+        "merged": "C:\\Users\\EARTH\\Google Drive\\Kibo-RPC 2021\\Code\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\layout-v21\\notification_action.xml",
+        "source": "C:\\Users\\EARTH\\.android\\build-cache\\ffb58c8c10b43515261d86446df6d076d514d933\\output\\res\\layout-v21\\notification_action.xml"
+    }
+]

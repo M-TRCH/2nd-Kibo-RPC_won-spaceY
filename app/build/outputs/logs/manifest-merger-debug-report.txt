@@ -1,0 +1,182 @@
+-- Merging decision tree log ---
+manifest
+ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:2:1-31:12
+	package
+		ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:4:5-46
+		INJECTED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml
+	android:versionName
+		INJECTED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml
+	xmlns:tools
+		ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:3:5-51
+	xmlns:android
+		ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:2:11-69
+	android:versionCode
+		INJECTED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml
+uses-permission#android.permission.INTERNET
+ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:6:5-66
+	android:name
+		ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:6:22-64
+uses-permission#android.permission.WAKE_LOCK
+ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:7:5-67
+MERGED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:15:5-68
+	android:name
+		ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:7:22-65
+application
+ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:9:5-29:19
+MERGED from [DefaultApk:guest_science_library:unspecified] C:\Users\EARTH\.android\build-cache\446184b602b739749695064777bff7d9a4d4d8dd\output\AndroidManifest.xml:11:5-25:19
+MERGED from [com.android.support:appcompat-v7:26.1.0] C:\Users\EARTH\.android\build-cache\50ac73e161a0d36bb4a336743f535f2c5bf3f9c2\output\AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:animated-vector-drawable:26.1.0] C:\Users\EARTH\.android\build-cache\3f681938744728a13246cc275c3dfacb227ddf4d\output\AndroidManifest.xml:22:5-26:19
+MERGED from [com.android.support:support-vector-drawable:26.1.0] C:\Users\EARTH\.android\build-cache\f7fc32376ff1b33528700dab07b35ee4e509961f\output\AndroidManifest.xml:22:5-26:19
+MERGED from [com.android.support.constraint:constraint-layout:1.0.2] C:\Users\EARTH\.android\build-cache\20ec8ce4762a124232815c663e45ee480f77f9c5\output\AndroidManifest.xml:9:5-20
+MERGED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:18:5-33:19
+MERGED from [me.dm7.barcodescanner:zbar:1.9.8] C:\Users\EARTH\.android\build-cache\6ff12e0e013c65bcad212d9391c2060f0dcba708\output\AndroidManifest.xml:11:5-20
+MERGED from [me.dm7.barcodescanner:core:1.9.8] C:\Users\EARTH\.android\build-cache\1a686e434cad3f2a61677a74fcf63313bcae3da6\output\AndroidManifest.xml:11:5-20
+MERGED from [com.android.support:support-v4:26.1.0] C:\Users\EARTH\.android\build-cache\d1ee304bda6c963a9700ac7f796f0e73ae108497\output\AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-media-compat:26.1.0] C:\Users\EARTH\.android\build-cache\688363bcddcebea9d0c6bf5e398087d5645a9c91\output\AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-fragment:26.1.0] C:\Users\EARTH\.android\build-cache\f1d60d0fff60bbf028094fc31ec27e359c833bdf\output\AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-core-ui:26.1.0] C:\Users\EARTH\.android\build-cache\60ac149786a326bc436d5ddc1e0ca8e7864a2f81\output\AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-core-utils:26.1.0] C:\Users\EARTH\.android\build-cache\ba079968bc60e75ac8ea758899a4ecfa04f51a3e\output\AndroidManifest.xml:25:5-29:19
+MERGED from [com.android.support:support-compat:26.1.0] C:\Users\EARTH\.android\build-cache\ffb58c8c10b43515261d86446df6d076d514d933\output\AndroidManifest.xml:25:5-29:19
+MERGED from [android.arch.lifecycle:runtime:1.0.0] C:\Users\EARTH\.android\build-cache\8e773c4e0d85fa9a5849263b657b48d703b40d81\output\AndroidManifest.xml:24:5-28:19
+	android:label
+		ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:12:9-41
+	android:supportsRtl
+		ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:14:9-35
+	android:roundIcon
+		ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:13:9-54
+	android:allowBackup
+		ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:10:9-35
+	android:icon
+		ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:11:9-43
+		REJECTED from [DefaultApk:guest_science_library:unspecified] C:\Users\EARTH\.android\build-cache\446184b602b739749695064777bff7d9a4d4d8dd\output\AndroidManifest.xml:13:9-43
+		REJECTED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:19:9-36
+	android:theme
+		ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:16:9-40
+	tools:replace
+		ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:15:9-37
+activity#jp.jaxa.iss.kibo.rpc.defaultapk.MainActivity
+ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:18:9-23:20
+	android:name
+		ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:18:19-78
+intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
+ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:19:13-22:29
+action#android.intent.action.MAIN
+ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:20:17-68
+	android:name
+		ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:20:25-66
+category#android.intent.category.LAUNCHER
+ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:21:17-76
+	android:name
+		ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:21:27-74
+service#jp.jaxa.iss.kibo.rpc.defaultapk.YourService
+ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:25:9-27:19
+	android:exported
+		ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:25:77-100
+	android:name
+		ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:25:18-76
+meta-data#Start Service
+ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:26:13-76
+	android:value
+		ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:26:53-73
+	android:name
+		ADDED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:26:24-52
+uses-sdk
+INJECTED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+MERGED from [DefaultApk:guest_science_library:unspecified] C:\Users\EARTH\.android\build-cache\446184b602b739749695064777bff7d9a4d4d8dd\output\AndroidManifest.xml:7:5-9:41
+MERGED from [DefaultApk:kibo_rpc_api:unspecified] C:\Users\EARTH\.android\build-cache\2561d8735d90ba4e6b76ff39e28505f35a1ae9fb\output\AndroidManifest.xml:7:5-9:41
+MERGED from [com.android.support:appcompat-v7:26.1.0] C:\Users\EARTH\.android\build-cache\50ac73e161a0d36bb4a336743f535f2c5bf3f9c2\output\AndroidManifest.xml:21:5-23:78
+MERGED from [com.android.support:animated-vector-drawable:26.1.0] C:\Users\EARTH\.android\build-cache\3f681938744728a13246cc275c3dfacb227ddf4d\output\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-vector-drawable:26.1.0] C:\Users\EARTH\.android\build-cache\f7fc32376ff1b33528700dab07b35ee4e509961f\output\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support.constraint:constraint-layout:1.0.2] C:\Users\EARTH\.android\build-cache\20ec8ce4762a124232815c663e45ee480f77f9c5\output\AndroidManifest.xml:5:5-7:41
+MERGED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:8:5-10:41
+MERGED from [com.quickbirdstudios:opencv:3.4.4-contrib] C:\Users\EARTH\.android\build-cache\9e321ff89756625489fe314ee54456b1cd58abad\output\AndroidManifest.xml:7:5-9:41
+MERGED from [me.dm7.barcodescanner:zbar:1.9.8] C:\Users\EARTH\.android\build-cache\6ff12e0e013c65bcad212d9391c2060f0dcba708\output\AndroidManifest.xml:7:5-9:41
+MERGED from [me.dm7.barcodescanner:core:1.9.8] C:\Users\EARTH\.android\build-cache\1a686e434cad3f2a61677a74fcf63313bcae3da6\output\AndroidManifest.xml:7:5-9:41
+MERGED from [com.android.support:support-v4:26.1.0] C:\Users\EARTH\.android\build-cache\d1ee304bda6c963a9700ac7f796f0e73ae108497\output\AndroidManifest.xml:21:5-23:54
+MERGED from [com.android.support:support-media-compat:26.1.0] C:\Users\EARTH\.android\build-cache\688363bcddcebea9d0c6bf5e398087d5645a9c91\output\AndroidManifest.xml:21:5-23:63
+MERGED from [com.android.support:support-fragment:26.1.0] C:\Users\EARTH\.android\build-cache\f1d60d0fff60bbf028094fc31ec27e359c833bdf\output\AndroidManifest.xml:21:5-23:60
+MERGED from [com.android.support:support-core-ui:26.1.0] C:\Users\EARTH\.android\build-cache\60ac149786a326bc436d5ddc1e0ca8e7864a2f81\output\AndroidManifest.xml:21:5-23:58
+MERGED from [com.android.support:support-core-utils:26.1.0] C:\Users\EARTH\.android\build-cache\ba079968bc60e75ac8ea758899a4ecfa04f51a3e\output\AndroidManifest.xml:21:5-23:61
+MERGED from [com.android.support:support-compat:26.1.0] C:\Users\EARTH\.android\build-cache\ffb58c8c10b43515261d86446df6d076d514d933\output\AndroidManifest.xml:21:5-23:58
+MERGED from [android.arch.lifecycle:runtime:1.0.0] C:\Users\EARTH\.android\build-cache\8e773c4e0d85fa9a5849263b657b48d703b40d81\output\AndroidManifest.xml:20:5-22:41
+	tools:overrideLibrary
+		ADDED from [com.android.support:appcompat-v7:26.1.0] C:\Users\EARTH\.android\build-cache\50ac73e161a0d36bb4a336743f535f2c5bf3f9c2\output\AndroidManifest.xml:23:9-75
+	android:targetSdkVersion
+		INJECTED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml
+receiver#gov.nasa.arc.astrobee.android.gs.InfoInqueryBroadcastReceiver
+ADDED from [DefaultApk:guest_science_library:unspecified] C:\Users\EARTH\.android\build-cache\446184b602b739749695064777bff7d9a4d4d8dd\output\AndroidManifest.xml:18:9-24:20
+	android:exported
+		ADDED from [DefaultApk:guest_science_library:unspecified] C:\Users\EARTH\.android\build-cache\446184b602b739749695064777bff7d9a4d4d8dd\output\AndroidManifest.xml:20:13-36
+	android:name
+		ADDED from [DefaultApk:guest_science_library:unspecified] C:\Users\EARTH\.android\build-cache\446184b602b739749695064777bff7d9a4d4d8dd\output\AndroidManifest.xml:19:13-89
+intent-filter#gov.nasa.arc.astrobee.android.gs.INFO_INQUIRY
+ADDED from [DefaultApk:guest_science_library:unspecified] C:\Users\EARTH\.android\build-cache\446184b602b739749695064777bff7d9a4d4d8dd\output\AndroidManifest.xml:21:13-23:29
+action#gov.nasa.arc.astrobee.android.gs.INFO_INQUIRY
+ADDED from [DefaultApk:guest_science_library:unspecified] C:\Users\EARTH\.android\build-cache\446184b602b739749695064777bff7d9a4d4d8dd\output\AndroidManifest.xml:22:17-88
+	android:name
+		ADDED from [DefaultApk:guest_science_library:unspecified] C:\Users\EARTH\.android\build-cache\446184b602b739749695064777bff7d9a4d4d8dd\output\AndroidManifest.xml:22:25-85
+meta-data#android.support.VERSION
+ADDED from [com.android.support:appcompat-v7:26.1.0] C:\Users\EARTH\.android\build-cache\50ac73e161a0d36bb4a336743f535f2c5bf3f9c2\output\AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:animated-vector-drawable:26.1.0] C:\Users\EARTH\.android\build-cache\3f681938744728a13246cc275c3dfacb227ddf4d\output\AndroidManifest.xml:23:9-25:38
+MERGED from [com.android.support:support-vector-drawable:26.1.0] C:\Users\EARTH\.android\build-cache\f7fc32376ff1b33528700dab07b35ee4e509961f\output\AndroidManifest.xml:23:9-25:38
+MERGED from [com.android.support:support-v4:26.1.0] C:\Users\EARTH\.android\build-cache\d1ee304bda6c963a9700ac7f796f0e73ae108497\output\AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-media-compat:26.1.0] C:\Users\EARTH\.android\build-cache\688363bcddcebea9d0c6bf5e398087d5645a9c91\output\AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-fragment:26.1.0] C:\Users\EARTH\.android\build-cache\f1d60d0fff60bbf028094fc31ec27e359c833bdf\output\AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-core-ui:26.1.0] C:\Users\EARTH\.android\build-cache\60ac149786a326bc436d5ddc1e0ca8e7864a2f81\output\AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-core-utils:26.1.0] C:\Users\EARTH\.android\build-cache\ba079968bc60e75ac8ea758899a4ecfa04f51a3e\output\AndroidManifest.xml:26:9-28:38
+MERGED from [com.android.support:support-compat:26.1.0] C:\Users\EARTH\.android\build-cache\ffb58c8c10b43515261d86446df6d076d514d933\output\AndroidManifest.xml:26:9-28:38
+	android:value
+		ADDED from [com.android.support:appcompat-v7:26.1.0] C:\Users\EARTH\.android\build-cache\50ac73e161a0d36bb4a336743f535f2c5bf3f9c2\output\AndroidManifest.xml:28:13-35
+	android:name
+		ADDED from [com.android.support:appcompat-v7:26.1.0] C:\Users\EARTH\.android\build-cache\50ac73e161a0d36bb4a336743f535f2c5bf3f9c2\output\AndroidManifest.xml:27:13-51
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:12:5-81
+	android:name
+		ADDED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:12:22-78
+uses-permission#android.permission.ACCESS_WIFI_STATE
+ADDED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:13:5-76
+	android:name
+		ADDED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:13:22-73
+uses-permission#android.permission.CHANGE_WIFI_STATE
+ADDED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:14:5-76
+	android:name
+		ADDED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:14:22-73
+uses-permission#android.permission.SYSTEM_ALERT_WINDOW
+ADDED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:16:5-78
+	android:name
+		ADDED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:16:22-75
+activity#org.ros.android.MasterChooser
+ADDED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:21:9-24:45
+	android:label
+		ADDED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:23:13-45
+	android:launchMode
+		ADDED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:24:13-42
+	android:name
+		ADDED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:22:13-57
+service#org.ros.android.NodeMainExecutorService
+ADDED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:26:9-32:19
+	tools:ignore
+		ADDED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:28:13-43
+	android:name
+		ADDED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:27:13-67
+intent-filter#org.ros.android.NodeMainExecutorService
+ADDED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:29:13-31:29
+action#org.ros.android.NodeMainExecutorService
+ADDED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:30:17-82
+	android:name
+		ADDED from [org.ros.android_core:android_10:0.2.1] C:\Users\EARTH\.android\build-cache\b36fd05a541c77a41eff20dbc191960b0d6058a2\output\AndroidManifest.xml:30:25-79
+uses-permission#android.permission.READ_EXTERNAL_STORAGE
+IMPLIED from C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\src\main\AndroidManifest.xml:2:1-31:12 reason: org.ros.android.android_10 requested WRITE_EXTERNAL_STORAGE
+meta-data#android.arch.lifecycle.VERSION
+ADDED from [android.arch.lifecycle:runtime:1.0.0] C:\Users\EARTH\.android\build-cache\8e773c4e0d85fa9a5849263b657b48d703b40d81\output\AndroidManifest.xml:25:9-27:47
+	android:value
+		ADDED from [android.arch.lifecycle:runtime:1.0.0] C:\Users\EARTH\.android\build-cache\8e773c4e0d85fa9a5849263b657b48d703b40d81\output\AndroidManifest.xml:27:13-44
+	android:name
+		ADDED from [android.arch.lifecycle:runtime:1.0.0] C:\Users\EARTH\.android\build-cache\8e773c4e0d85fa9a5849263b657b48d703b40d81\output\AndroidManifest.xml:26:13-58

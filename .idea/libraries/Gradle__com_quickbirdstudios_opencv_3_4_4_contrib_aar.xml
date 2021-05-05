@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.quickbirdstudios:opencv:3.4.4-contrib@aar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.android/build-cache/9e321ff89756625489fe314ee54456b1cd58abad/output/res" />
+      <root url="jar://$USER_HOME$/.android/build-cache/9e321ff89756625489fe314ee54456b1cd58abad/output/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.quickbirdstudios/opencv/3.4.4-contrib/cd2c9c58692b78eec9e13ff5d2ffa32a5f0ba4fc/opencv-3.4.4-contrib-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
