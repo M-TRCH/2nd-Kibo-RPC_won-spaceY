@@ -30,12 +30,12 @@ import static org.opencv.android.Utils.matToBitmap;
 
 public class YourService extends KiboRpcService
 {
-    int Pattern = 0;										// Store pattern value.
+	int Pattern = 0;										// Store pattern value.
 	boolean QRCodeFinish = false, ARCodeFinish = false;	// State of QR and AR event.
 
 	final Point Point_A = new Point(11.21, -9.8, 4.79);	//	Point of A
-    final Quaternion Quaternion_A = new Quaternion(0, 0, -0.707f, 0.707f);	// Quaternion of A
-    Point Point_A_Prime = new Point(0, 0, 0);				//	Point of A prime
+	final Quaternion Quaternion_A = new Quaternion(0, 0, -0.707f, 0.707f);	// Quaternion of A
+	Point Point_A_Prime = new Point(0, 0, 0);				//	Point of A prime
 	Point Point_Target = new Point(0, -10.585, 0);		//	Point of Target
 	Point Point_Shift = new Point(-0.16966, 0, -0.02683);	//	Laser distance shift.
 
@@ -50,15 +50,24 @@ public class YourService extends KiboRpcService
 
 		PointA_Event();
 
+
 		Log.d("Robot[State]: ", "Aim to target point");
-        moveTo(11.21f, -9.8f, 4.79f,	Point_Target.getX()+Point_Shift.getX(),
-														Point_Target.getY()+Point_Shift.getY(),
-														Point_Target.getZ()+Point_Shift.getZ());
+        moveTo(Point_A.getX(), Point_A.getY(), Point_A.getZ(),	Point_Target.getX() + Point_Shift.getX(),
+																Point_Target.getY() + Point_Shift.getY(),
+																Point_Target.getZ() + Point_Shift.getZ());
 
         Log.d("Robot[State]: ", "Take a snapshot");
         api.takeSnapshot();
 
-        Log.d("Robot[State]: ", "Move to A-B point");
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		moveTo(Point_A, new Quaternion(0.707f, -0.707f, 0, 0)); // invert
+
+
+		long timeStart = SystemClock.elapsedRealtime();
+		while(SystemClock.elapsedRealtime() - timeStart < 5000);
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		Log.d("Robot[State]: ", "Move to A-B point");
         moveTo(10.46f, -8.65f, 4.65f, 0f, 0f, 0.707f, 0.707f);
 		Log.d("Robot[State]: ", "Laser is off");
 		api.laserControl(false);
@@ -78,7 +87,7 @@ public class YourService extends KiboRpcService
 	public void moveTo(Point point, Quaternion quaternion)
 	/* Re-check api.moveTo function is successful or until max number of counter. */ {
 		Result result;
-		int count = 0, max_count = 4;
+		int count = 0, max_count = 2;
 		do
 		{
 			result = api.moveTo(point, quaternion, true);
@@ -366,12 +375,42 @@ public class YourService extends KiboRpcService
 						Point_Target = new Point(Point_Robot.getX() - X_dif, Point_Target.getY(), Point_Robot.getZ() - Y_dif);	// Calculate target position on ISS
 						/* Data Logger */
 						Log.d("TargetCal[Data][Dif]:", " X: " + X_dif + ", Y: " + Y_dif);
+						Log.d("TargetCal[Data][Robot_Point]:", " X: " + Point_Robot.getX() + ", Y: " + Point_Robot.getY() + ", Z: " + Point_Robot.getZ());
 						Log.d("TargetCal[Data][Point]:", " X: " + Point_Target.getX() + ", Y: " + Point_Target.getY() + ", Z: " + Point_Target.getZ());
 						Log.d("TargetCal[Total_Time]:", " " + (SystemClock.elapsedRealtime() - timeStart2));
 						ARCodeFinish = true; // Set new condition.
 					}
 					Log.d("AR[Total_Time]:", " " + (SystemClock.elapsedRealtime() - timeStart) / 1000);
 				}
+			}
+
+			if(QRCodeFinish && ARCodeFinish)
+			{
+				Log.e("HCC[State]: ", "Starting");
+				timeStart = SystemClock.elapsedRealtime();
+				Mat gray = new Mat();
+				Mat blur = new Mat();
+				Mat circles = new Mat();
+
+				try
+				{
+					Imgproc.cvtColor(matSrc, matSrc, Imgproc.COLOR_GRAY2BGR);
+					Imgproc.cvtColor(matSrc, gray, Imgproc.COLOR_BGR2GRAY);
+					Imgproc.medianBlur(gray, blur, 5);
+					Imgproc.HoughCircles(blur, circles, Imgproc.HOUGH_GRADIENT, 1, 5, 1000, 20, 30, 50);
+
+					Log.d("HCC[Number]: ", "" + circles.cols());
+					for (int i = 0; i < circles.cols(); i++ )
+					{
+						double[] data = circles.get(0, i);
+						Log.d("HCC[Point][" + i + "]:"," X: " + Math.round(data[0]) + ", Y: " +  Math.round(data[1]));
+					}
+				}
+				catch (Exception e)
+				{
+					Log.e("HCC[State]: ", "Failure");
+				}
+				Log.d("HCC[Total_Time]:", " " + (SystemClock.elapsedRealtime() - timeStart) / 1000);
 			}
 			Log.d("A_Event[State]:", " Finished");
 			Log.d("A_Event[Count]:", " " + loopCount);
@@ -417,3 +456,15 @@ public class YourService extends KiboRpcService
         moveTo((float)x_org, (float)y_org, (float)z_org, (float)a, (float)b, (float)c, (float)w);
     }
 }
+//                                                                                                                                       lll         lll
+//                                                                                                                                        lll       lll
+//		lll      lllll      lll lllllllllllllll llllll      lll         llllllllllll llllllllllll    lllll       llllllllllll llllllllllll lll     lll
+//		lll     lll lll     lll lll         lll lll lll     lll         lll          lll      lll   lll lll      lll          lll           lll   lll
+//       lll   lll   lll   lll  lll         lll lll  lll    lll         lll          lll      lll  lll   lll     lll          lll            lll lll
+//       lll   lll   lll   lll  lll         lll lll   lll   lll lllllll llllllllllll llllllllllll lllllllllll    lll          llllllllllll    lllll
+//        lll lll     lll lll   lll         lll lll    lll  lll                  lll lll         lll       lll   lll          lll              lll
+//        lll lll     lll lll   lll         lll lll     lll lll                  lll lll        lll         lll  lll          lll              lll
+//         lllll       lllll    lllllllllllllll lll      llllll         llllllllllll lll       lll           lll llllllllllll llllllllllll     lll
+//
+//         lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
+
