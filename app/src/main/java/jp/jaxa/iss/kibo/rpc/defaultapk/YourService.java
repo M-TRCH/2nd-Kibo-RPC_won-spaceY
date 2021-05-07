@@ -30,14 +30,17 @@ import static org.opencv.android.Utils.matToBitmap;
 
 public class YourService extends KiboRpcService
 {
-	int Pattern = 0;										// Store pattern value.
-	boolean QRCodeFinish = false, ARCodeFinish = false;	// State of QR and AR event.
+	int Pattern = 0;				// Store pattern value.
+	boolean QRCodeFinish = false,
+			ARCodeFinish = false,
+			CircleFinish = false;	// State of QR, AR event and circle detection event.
 
 	final Point Point_A = new Point(11.21, -9.8, 4.79);	//	Point of A
 	final Quaternion Quaternion_A = new Quaternion(0, 0, -0.707f, 0.707f);	// Quaternion of A
 	Point Point_A_Prime = new Point(0, 0, 0);				//	Point of A prime
 	Point Point_Target = new Point(0, -10.585, 0);		//	Point of Target
-	Point Point_Shift = new Point(-0.16966, 0, -0.02683);	//	Laser distance shift.
+	Point Point_Shift1 = new Point(-0.16966, 0, -0.02683);	//	Laser distance shift (1: AR Intersection Method).
+	Point Point_Shift2 = new Point(-0.17866, 0, -0.13483);	//	Laser distance shift (2: HC Average Method).
 
 	@Override
     protected void runPlan1()
@@ -48,23 +51,23 @@ public class YourService extends KiboRpcService
 		Log.d("Robot[State]: ", "Laser is on");
 		api.laserControl(true);
 
+
 		PointA_Event();
 
 
 		Log.d("Robot[State]: ", "Aim to target point");
-        moveTo(Point_A.getX(), Point_A.getY(), Point_A.getZ(),	Point_Target.getX() + Point_Shift.getX(),
-																Point_Target.getY() + Point_Shift.getY(),
-																Point_Target.getZ() + Point_Shift.getZ());
+        moveTo(Point_A.getX(), Point_A.getY(), Point_A.getZ(),	Point_Target.getX() + Point_Shift2.getX(),
+																Point_Target.getY() + Point_Shift2.getY(),
+																Point_Target.getZ() + Point_Shift2.getZ());
 
         Log.d("Robot[State]: ", "Take a snapshot");
         api.takeSnapshot();
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		moveTo(Point_A, new Quaternion(0.707f, -0.707f, 0, 0)); // invert
-
-
-		long timeStart = SystemClock.elapsedRealtime();
-		while(SystemClock.elapsedRealtime() - timeStart < 5000);
+//		moveTo(Point_A, new Quaternion(0.707f, -0.707f, 0, 0)); // Rotate Test!!!
+//
+//		long timeStart = SystemClock.elapsedRealtime();
+//		while(SystemClock.elapsedRealtime() - timeStart < 5000);
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		Log.d("Robot[State]: ", "Move to A-B point");
@@ -240,12 +243,14 @@ public class YourService extends KiboRpcService
 		double[][] AR_Center = new double[4][2]; 	// Variable store center each of AR tag.
 		/* Set parameter about QR Code. */
 		Bitmap bitmapSrc = Bitmap.createBitmap(finalWidth, finalHeight, Bitmap.Config.ARGB_8888); // Bitmap image according to the requirement of QR reading.
-		String QR_Info = null; 			// Content from QR Code reader.
+		String QR_Info = null; 						// Content from QR Code reader.
+		/* Set parameter about target tag */
+		double PixelToMeter = 0;					// Ratio of AR dimension.
 		/* Set general parameter */
 		int loopCount = 0; 				// Variable of loop counter.
 		final int loopCountMax = 5;		// Variable of max loop count.
 
-		while(!ARCodeFinish && loopCount < loopCountMax)
+		while(!CircleFinish && loopCount < loopCountMax)
         { /* The condition is defined with success ar code reading and the number of loops (the AR code must be read before the AR code can be read). */
             Log.d("Move&GetImage[State]:", " Starting");
             long timeStart = SystemClock.elapsedRealtime();
@@ -307,7 +312,8 @@ public class YourService extends KiboRpcService
 			}
 
 			// Third step (AR code event) : Get image form Nav Camera -> AR Code decoder -> Calculate target position.
-			if(!ARCodeFinish && QRCodeFinish)
+			boolean AR_ON = false;	// ON-OFF AR event function
+			if(!ARCodeFinish && QRCodeFinish && AR_ON)
 			{
 				timeStart = SystemClock.elapsedRealtime();
 				try
@@ -358,7 +364,7 @@ public class YourService extends KiboRpcService
 						double[] Buf = Intersection(AR_Center); 			// Calculate target point from AR tag.
 						Buf[0] = (originalWidth - finalWidth)/2D + Buf[0];	// Reference the original width image size.
 						Buf[1] = originalHeight - finalHeight    + Buf[1];	// Reference the original height image size.
-						double PixelToMeter = Buf[2] / 0.2398207664D;		// Constant value is actual AR tag diagonal size
+						PixelToMeter = Buf[2] / 0.2398207664D;				// Constant value is actual AR tag diagonal size
 						Log.d("TargetCal[Data][Raw_Dif}:", " X: " + (640-Buf[0]) + " Y: " + (480-Buf[1]));
 						Log.d("TargetCal[Data][Ratio}:", " " + PixelToMeter);
 //						PixelToMeter = 618.3450759928269D;					// Constant ratio by won-spaceY.
@@ -384,33 +390,52 @@ public class YourService extends KiboRpcService
 				}
 			}
 
-			if(QRCodeFinish && ARCodeFinish)
+			// Fourth step (Hough circle detection) : Get image form Nav Camera -> Circle detector -> Calculate target position.
+			if(!CircleFinish && QRCodeFinish)
 			{
-				Log.e("HCC[State]: ", "Starting");
+				Log.e("HC[State]: ", "Starting");
 				timeStart = SystemClock.elapsedRealtime();
+				/* Variables are used to store matrix images of each process. */
 				Mat gray = new Mat();
 				Mat blur = new Mat();
 				Mat circles = new Mat();
 
 				try
 				{
-					Imgproc.cvtColor(matSrc, matSrc, Imgproc.COLOR_GRAY2BGR);
-					Imgproc.cvtColor(matSrc, gray, Imgproc.COLOR_BGR2GRAY);
-					Imgproc.medianBlur(gray, blur, 5);
+					Imgproc.cvtColor(matSrc, matSrc, Imgproc.COLOR_GRAY2BGR); // 3UC1 Image convert to BGR image.
+					Imgproc.cvtColor(matSrc, gray, Imgproc.COLOR_BGR2GRAY);   // BGR Image convert to grayscale image.
+					Imgproc.medianBlur(gray, blur, 5);					// Median blur process
 					Imgproc.HoughCircles(blur, circles, Imgproc.HOUGH_GRADIENT, 1, 5, 1000, 20, 30, 50);
-
-					Log.d("HCC[Number]: ", "" + circles.cols());
+					//	1.Input image 2.Output data 3.Type of Method 4.Ratio of raw image
+					//	5.Minimum distance of center to center, 6.Canny edge value, 7.Threshold value 8.Minimum circle radius 9.Maximum circle radius
+					Log.d("HC[Number]: ", "" + circles.cols()); 	// "circles.cols()" is number of circles to detect.
+					double x_avg = 0, y_avg = 0, radius = 0;				// x, y position and radius (In average value).
 					for (int i = 0; i < circles.cols(); i++ )
 					{
-						double[] data = circles.get(0, i);
-						Log.d("HCC[Point][" + i + "]:"," X: " + Math.round(data[0]) + ", Y: " +  Math.round(data[1]));
+						double[] data = circles.get(0, i);	// Get x, y, r data
+						x_avg  += Math.round(data[0]);				// Get X position at i index
+						y_avg  += Math.round(data[1]);				// Get Y position at i index
+						radius += Math.round(data[2]);				// Get Radius at i index
+						Log.d("HC[Point][" + i + "]:"," X: " + Math.round(data[0]) + ", Y: " +  Math.round(data[1]) + ", R: " + Math.round(data[2]));
 					}
+					x_avg = (originalWidth - finalWidth)/2D + (x_avg / circles.cols());	// Reference the original width image size.
+					y_avg = originalHeight - finalHeight    + (y_avg / circles.cols());	// Reference the original height image size.
+					PixelToMeter = radius / circles.cols() / 0.075;						// Using constant value of target tag radius.
+					double X_dif = (originalWidth  / 2.0D - x_avg) / PixelToMeter;			// The x-axis distance between the robot and the target : meter unit
+					double Y_dif = (originalHeight / 2.0D - y_avg) / PixelToMeter;			// The y-axis distance between the robot and the target : meter unit
+					Point_Target = new Point(Point_A.getX() - X_dif, Point_Target.getY(), Point_A.getZ() - Y_dif);	// Calculate target position on ISS
+					/* Data Logger */
+					Log.d("HC[Data][Ratio]:", " " + PixelToMeter);
+					Log.d("HC[Data][Dif]:", " X: " + X_dif + ", Y: " + Y_dif);
+					Log.d("HC[Data][Point]:", " X: " + Point_Target.getX() + ", Y: " + Point_Target.getY() + ", Z: " + Point_Target.getZ());
+					CircleFinish = true; // Set new while() condition
 				}
-				catch (Exception e)
+				catch (Exception error)
 				{
-					Log.e("HCC[State]: ", "Failure");
+					Log.e("HC[State]: ", "Failure");
+					Log.e("HC[Error]: ", error.getMessage());
 				}
-				Log.d("HCC[Total_Time]:", " " + (SystemClock.elapsedRealtime() - timeStart) / 1000);
+				Log.d("HC[Total_Time]:", " " + (SystemClock.elapsedRealtime() - timeStart) / 1000);
 			}
 			Log.d("A_Event[State]:", " Finished");
 			Log.d("A_Event[Count]:", " " + loopCount);
