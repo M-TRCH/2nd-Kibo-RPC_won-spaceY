@@ -40,7 +40,8 @@ public class YourService extends KiboRpcService
 	Point Point_A_Prime = new Point(0, 0, 0);				//	Point of A prime
 	Point Point_Target = new Point(0, -10.585, 0);		//	Point of Target
 	Point Point_Shift1 = new Point(-0.16966, 0, -0.02683);	//	Laser distance shift (1: AR Intersection Method).
-	Point Point_Shift2 = new Point(-0.17866, 0, -0.13483);	//	Laser distance shift (2: HC Average Method).
+	Point Point_Shift2 = new Point(-0.17266, 0, -0.13983);	//	Laser distance shift (2: AR Average Method).
+	Point Point_Shift3 = new Point(-0.17866, 0, -0.13483);	//	Laser distance shift (2: HC Average Method).
 
 	@Override
     protected void runPlan1()
@@ -226,6 +227,24 @@ public class YourService extends KiboRpcService
         // return data format 0: center of x, 1: center of y, 2: average of line length.
         return dataOut;
     }
+    public double[] AverageNumber(double[][] n)
+	/* Function to calculate the average x 4 numbers and y 4 numbers ใ */ {
+		/* Input Format :
+			[X 1][Y 1]
+		    [X 2][Y 2]
+		    [X 1][Y 1]
+		    [X 2][Y 2]
+		*/
+		double x_avg = 0, y_avg = 0;	//	x, y average output
+		for(int i=0; i<4; i++)
+		{
+			x_avg += n[i][0];
+			y_avg += n[i][1];
+		}
+		x_avg /= 4;
+		y_avg /= 4;
+		return new double[]{x_avg, y_avg};
+	}
     public void PointA_Event()
     /* All events that take position at the point of A include QR Code Reading, AR Code Reading and Target position analyzing. */ {
 		/* Set parameter related to image from navigation camera. */
@@ -250,7 +269,7 @@ public class YourService extends KiboRpcService
 		int loopCount = 0; 				// Variable of loop counter.
 		final int loopCountMax = 5;		// Variable of max loop count.
 
-		while(!CircleFinish && loopCount < loopCountMax)
+		while(!ARCodeFinish && loopCount < loopCountMax)
         { /* The condition is defined with success ar code reading and the number of loops (the AR code must be read before the AR code can be read). */
             Log.d("Move&GetImage[State]:", " Starting");
             long timeStart = SystemClock.elapsedRealtime();
@@ -312,7 +331,7 @@ public class YourService extends KiboRpcService
 			}
 
 			// Third step (AR code event) : Get image form Nav Camera -> AR Code decoder -> Calculate target position.
-			boolean AR_ON = false;	// ON-OFF AR event function
+			boolean AR_ON = true;	// ON-OFF AR event function
 			if(!ARCodeFinish && QRCodeFinish && AR_ON)
 			{
 				timeStart = SystemClock.elapsedRealtime();
@@ -352,22 +371,31 @@ public class YourService extends KiboRpcService
 								{(int) Corners.get(i).get(0, 1)[0], (int) Corners.get(i).get(0, 1)[1]},
 								{(int) Corners.get(i).get(0, 3)[0], (int) Corners.get(i).get(0, 3)[1]}
 							};
-							double[] AR_Point = Intersection(Corner); 	// Calculate center of AR tag.
-							int Index = -1;								// Set initial index
-						  		 if (AR_ID[i] == 1) Index = 0;			// Origin coordinate of Line 1
-							else if (AR_ID[i] == 2) Index = 2;			// Origin coordinate of Line 2
-							else if (AR_ID[i] == 3) Index = 1;			// Final coordinate of Line 1
-							else if (AR_ID[i] == 4) Index = 3;			// Final coordinate of Line 2
-							AR_Center[Index][0] = AR_Point[0];			// return x point of AR tag
-							AR_Center[Index][1] = AR_Point[1];			// return y point of AR tag
+							/* Intersection Method */
+//							double[] AR_Point = Intersection(Corner); 	// Calculate center of AR tag.
+//							int Index = -1;								// Set initial index
+//						  		 if (AR_ID[i] == 1) Index = 0;			// Origin coordinate of Line 1
+//							else if (AR_ID[i] == 2) Index = 2;			// Origin coordinate of Line 2
+//							else if (AR_ID[i] == 3) Index = 1;			// Final coordinate of Line 1
+//							else if (AR_ID[i] == 4) Index = 3;			// Final coordinate of Line 2
+//							AR_Center[Index][0] = AR_Point[0];			// return x point of AR tag
+//							AR_Center[Index][1] = AR_Point[1];			// return y point of AR tag
+							/* Average Method */
+							double[] AR_Point = AverageNumber(Corner);
+							AR_Center[i][0] = AR_Point[0];
+							AR_Center[i][1] = AR_Point[1];
 						}
-						double[] Buf = Intersection(AR_Center); 			// Calculate target point from AR tag.
+						/* Intersection Method */
+//						double[] Buf = Intersection(AR_Center); 			// Calculate target point from AR tag.
+//						PixelToMeter = Buf[2] / 0.2398207664D;				// Constant value is actual AR tag diagonal size
+						/* Average Method */
+						double[] Buf = AverageNumber(AR_Center); 			// Calculate target point from AR tag.
+
 						Buf[0] = (originalWidth - finalWidth)/2D + Buf[0];	// Reference the original width image size.
 						Buf[1] = originalHeight - finalHeight    + Buf[1];	// Reference the original height image size.
-						PixelToMeter = Buf[2] / 0.2398207664D;				// Constant value is actual AR tag diagonal size
 						Log.d("TargetCal[Data][Raw_Dif}:", " X: " + (640-Buf[0]) + " Y: " + (480-Buf[1]));
 						Log.d("TargetCal[Data][Ratio}:", " " + PixelToMeter);
-//						PixelToMeter = 618.3450759928269D;					// Constant ratio by won-spaceY.
+						PixelToMeter = 533.333333333;						// Constant ratio by won-spaceY.
 						Point Point_Robot = Point_A;						// Temporary coordinate of target.
 						if(Robot != null)									// Re-check get kinematic is successful.
 						{
@@ -391,7 +419,8 @@ public class YourService extends KiboRpcService
 			}
 
 			// Fourth step (Hough circle detection) : Get image form Nav Camera -> Circle detector -> Calculate target position.
-			if(!CircleFinish && QRCodeFinish)
+			boolean HC_ON = false;	// ON-OFF Hough circle event function
+			if(!CircleFinish && QRCodeFinish && HC_ON)
 			{
 				Log.e("HC[State]: ", "Starting");
 				timeStart = SystemClock.elapsedRealtime();
