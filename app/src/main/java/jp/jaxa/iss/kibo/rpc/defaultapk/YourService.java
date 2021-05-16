@@ -14,7 +14,9 @@ import org.opencv.aruco.Aruco;
 import org.opencv.aruco.Dictionary;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
@@ -36,7 +38,9 @@ public class YourService extends KiboRpcService
 			CircleFinish = false;	// State of QR, AR event and circle detection event.
 
 	final Point Point_A = new Point(11.21, -9.8, 4.79);	//	Point of A
+//	final Point Point_A = new Point(10.61, -9.8, 4.53);	//	Point of A
 	final Quaternion Quaternion_A = new Quaternion(0, 0, -0.707f, 0.707f);	// Quaternion of A
+//	final Quaternion Quaternion_A = new Quaternion(0.707f, -0.707f, 0, 0);
 	Point Point_A_Prime = new Point(0, 0, 0);				//	Point of A prime
 	Point Point_Target = new Point(0, -10.585, 0);		//	Point of Target
 	Point Point_Shift1 = new Point(-0.16966, 0, -0.02683);	//	Laser distance shift (1: AR Intersection Method).
@@ -50,6 +54,27 @@ public class YourService extends KiboRpcService
 	{
 		api.startMission();
 		Log.d("Robot[State]: ", "Starting the mission");
+
+		/*
+		long timeStart = SystemClock.elapsedRealtime();
+		Mat s = api.getMatNavCam();
+
+		int width = 156; // 156
+		int height = 117; // 117
+		Size size = new Size(width, height);
+		Imgproc.resize(s, s, size);
+
+		for(int h=0; h<height; h++)
+		{
+			for(int w=0; w<width; w++)
+			{
+				double[] v = s.get(h, w);
+				Log.d("[" + h + ", " + w + "]", ": " + v[0]);
+			}
+			if(SystemClock.elapsedRealtime() - timeStart > 280000) break;
+		}
+		Log.d("", "WOW!!!");
+		*/
 
 		Log.d("Robot[State]: ", "Laser is on");
 		api.laserControl(true);
@@ -77,12 +102,11 @@ public class YourService extends KiboRpcService
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		Log.d("Robot[State]: ", "Move to A-B point");
-		moveTo(10.46f, -8.65f, 4.65f, 0f, 0f, 0.707f, 0.707f);
+		moveTo(10.49f, -8.8f, 4.645f, 0f, 0f, 0.707f, 0.707f);
 		Log.d("Robot[State]: ", "Laser is off");
 		api.laserControl(false);
 		Log.d("Robot[State]: ", "Move to B point");
 		moveTo(10.6f, -8.0f, 4.5f, 0f, 0f, -0.707f, 0.707f);
-
 		finishMission();
 	}
 	@Override
@@ -93,10 +117,21 @@ public class YourService extends KiboRpcService
 	protected void runPlan3()
 	{
 	}
-	public void moveTo(Point point, Quaternion quaternion)
+//	public void moveTo(Point point, Quaternion Qua, int max_count)
+//	{
+//		Result result = api.moveTo(point, Qua, true);
+//		final byte loopMax = 3;
+//		byte loopCount = 0;
+//		while (!result.hasSucceeded() || loopCount < loopMax)
+//		{
+//			result = api.moveTo(point, Qua, true);
+//			loopCount++;
+//		}
+//	}
+	public void moveTo(Point point, Quaternion quaternion, int max_count)
 		/* Re-check api.moveTo function is successful or until max number of counter. */ {
 		Result result;
-		int count = 0, max_count = 2;
+		int count = 0;
 		do
 		{
 			result = api.moveTo(point, quaternion, true);
@@ -108,7 +143,7 @@ public class YourService extends KiboRpcService
 		/* Convert float number in argument to object of point and quaternion. */ {
 		Point point = new Point(px, py, pz);
 		Quaternion quaternion = new Quaternion(qx, qy, qz, qw);
-		moveTo(point, quaternion);
+		moveTo(point, quaternion, 2);
 	}
 	public void finishMission()
 		/* Re-check api.reportMissionCompletion, The cause is sometimes unresponsive.*/ {
@@ -266,7 +301,7 @@ public class YourService extends KiboRpcService
 		int[] AR_ID = new int[]{0, 0, 0, 0};		// Variable store ID each of AR code. : Array of Int format
 		double[][] AR_Center = new double[4][2]; 	// Variable store center each of AR tag.
 		/* Set parameter about QR Code. */
-		Bitmap bitmapSrc = Bitmap.createBitmap(finalWidth, finalHeight, Bitmap.Config.ARGB_8888); // Bitmap image according to the requirement of QR reading.
+		// Bitmap bitmapSrc = Bitmap.createBitmap(finalWidth, finalHeight, Bitmap.Config.ARGB_8888); // Bitmap image according to the requirement of QR reading.
 		String QR_Info = null; 						// Content from QR Code reader.
 		/* Set parameter about target tag */
 		double PixelToMeter = 0;					// Ratio of AR dimension.
@@ -274,14 +309,20 @@ public class YourService extends KiboRpcService
 		int loopCount = 0; 				// Variable of loop counter.
 		final int loopCountMax = 5;		// Variable of max loop count.
 
-		while(!ARCodeFinish && loopCount < loopCountMax)
+		while(!QRCodeFinish && loopCount < loopCountMax)
 		{ /* The condition is defined with success ar code reading and the number of loops (the AR code must be read before the AR code can be read). */
 			Log.d("Move&GetImage[State]:", " Starting");
 			long timeStart = SystemClock.elapsedRealtime();
 
 			// First step : Movement to point A positionn -> Get image form Nav Camera -> Get realtime position of robot.
-			moveTo(Point_A, Quaternion_A);
-			Mat matSrc = new Mat(api.getMatNavCam(), CustomCrop(originalWidth, originalHeight, widthCut/2, widthCut/2));
+			// moveTo(Point_A, Quaternion_A);
+//			long timeStart3 = SystemClock.elapsedRealtime();
+//			while(SystemClock.elapsedRealtime() - timeStart3 < 10000);
+//			moveTo(Point_A, Quaternion_A);
+
+			// Mat matSrc = new Mat(api.getMatNavCam(), CustomCrop(originalWidth, originalHeight, widthCut/2, widthCut/2));
+			Bitmap bitmapSrc = fitCrop();
+			// Test!!!
 			Kinematics Robot = api.getTrustedRobotKinematics();
 			Log.d("Move&GetImage[State]:", " Finished");
 			Log.d("Move&GetImage[Total_Time]:", " " + (SystemClock.elapsedRealtime() - timeStart) / 1000);
@@ -294,7 +335,7 @@ public class YourService extends KiboRpcService
 					Log.d("QR[State]:", " Starting");
 					timeStart = SystemClock.elapsedRealtime();
 
-					matToBitmap(matSrc, bitmapSrc, false); 					// Convert mat image to bitmap image.
+					// matToBitmap(matSrc, bitmapSrc, false); 					// Convert mat image to bitmap image.
 					int[] pixel = new int[bitmapSrc.getWidth() * bitmapSrc.getHeight()];  // Calculate image dimension.
 					bitmapSrc.getPixels(pixel, 0, bitmapSrc.getWidth(), 0, 0, bitmapSrc.getWidth(), bitmapSrc.getHeight());
 					Image QR_code = new Image(bitmapSrc.getWidth(), bitmapSrc.getHeight(), "RGB4");
@@ -336,9 +377,12 @@ public class YourService extends KiboRpcService
 			}
 
 			// Third step (AR code event) : Get image form Nav Camera -> AR Code decoder -> Calculate target position.
-			boolean AR_ON = true;	// ON-OFF AR event function
+			boolean AR_ON = false;	// ON-OFF AR event function
 			if(!ARCodeFinish && QRCodeFinish && AR_ON)
 			{
+				Mat matSrc = new Mat(api.getMatNavCam(), CustomCrop(originalWidth, originalHeight, widthCut/2, widthCut/2));
+				// test!!!
+
 				timeStart = SystemClock.elapsedRealtime();
 				try
 				{
@@ -347,12 +391,12 @@ public class YourService extends KiboRpcService
 
 					Aruco.detectMarkers(matSrc, Dict, Corners, IDs); 	// AR tag detector
 					AR_ID = new int[] 									// Put ID of AR Code to Array of int.
-							{
-									(int) IDs.get(0, 0)[0],
-									(int) IDs.get(1, 0)[0],
-									(int) IDs.get(2, 0)[0],
-									(int) IDs.get(3, 0)[0]
-							};
+					{
+						(int) IDs.get(0, 0)[0],
+						(int) IDs.get(1, 0)[0],
+						(int) IDs.get(2, 0)[0],
+						(int) IDs.get(3, 0)[0]
+					};
 					Log.d("AR[State]:", " Detected");
 				}
 				catch (Exception error)
@@ -370,12 +414,12 @@ public class YourService extends KiboRpcService
 						for (int i = 0; i < 4; i++)
 						{
 							double[][] Corner =		// Put each AR tag corners to 2d-array of double.
-									{
-											{(int) Corners.get(i).get(0, 0)[0], (int) Corners.get(i).get(0, 0)[1]},
-											{(int) Corners.get(i).get(0, 2)[0], (int) Corners.get(i).get(0, 2)[1]},
-											{(int) Corners.get(i).get(0, 1)[0], (int) Corners.get(i).get(0, 1)[1]},
-											{(int) Corners.get(i).get(0, 3)[0], (int) Corners.get(i).get(0, 3)[1]}
-									};
+							{
+								{(int) Corners.get(i).get(0, 0)[0], (int) Corners.get(i).get(0, 0)[1]},
+								{(int) Corners.get(i).get(0, 2)[0], (int) Corners.get(i).get(0, 2)[1]},
+								{(int) Corners.get(i).get(0, 1)[0], (int) Corners.get(i).get(0, 1)[1]},
+								{(int) Corners.get(i).get(0, 3)[0], (int) Corners.get(i).get(0, 3)[1]}
+							};
 							/* Intersection Method */
 //							double[] AR_Point = Intersection(Corner); 	// Calculate center of AR tag.
 //							int Index = -1;								// Set initial index
@@ -427,6 +471,9 @@ public class YourService extends KiboRpcService
 			boolean HC_ON = false;	// ON-OFF Hough circle event function
 			if(!CircleFinish && QRCodeFinish && HC_ON)
 			{
+				Mat matSrc = new Mat(api.getMatNavCam(), CustomCrop(originalWidth, originalHeight, widthCut/2, widthCut/2));
+				// test!!!
+
 				Log.e("HC[State]: ", "Starting");
 				timeStart = SystemClock.elapsedRealtime();
 				/* Variables are used to store matrix images of each process. */
@@ -500,6 +547,76 @@ public class YourService extends KiboRpcService
 
 		moveTo((float)x_org, (float)y_org, (float)z_org, 0.0f, (float)y, (float)z, (float)w);
 	}
+	public Bitmap fitCrop()
+	{
+		boolean exit = false;
+		int loopCount = 0;
+		final int loopCountMax = 6;
+
+		Mat matSrc = new Mat();
+		Mat graySrc = new Mat();
+		Rect size = CustomCrop(1280, 960, 340,340);
+		List<MatOfPoint> contours = new ArrayList<>();
+		Mat hierarchy = new Mat();
+		int move_count = 2;
+
+//		long timeStart2 = SystemClock.elapsedRealtime();
+//		moveTo(Point_A, Quaternion_A, move_count);
+//		Log.d("movTime[Total_Time]:", " " + (SystemClock.elapsedRealtime() - timeStart2));
+
+		while(!exit && loopCount < loopCountMax)
+		{
+			long timeStart2 = SystemClock.elapsedRealtime();
+			moveTo(Point_A, Quaternion_A, move_count);
+			Log.d("movTime[Total_Time]:", " " + (SystemClock.elapsedRealtime() - timeStart2));
+
+			timeStart2 = SystemClock.elapsedRealtime();
+			api.flashlightControlFront(0.025f); // 0.025
+			matSrc = api.getMatNavCam();
+			matSrc = new Mat(matSrc, CustomCrop(1280, 960, 340,340));
+			Log.d("navTime[Total_Time]:", " " + (SystemClock.elapsedRealtime() - timeStart2));
+			api.flashlightControlFront(0);
+
+
+			long timeStart = SystemClock.elapsedRealtime();
+//			Imgproc.cvtColor(matSrc, graySrc, Imgproc.COLOR_GRAY2BGR);
+//			Imgproc.cvtColor(graySrc, graySrc, Imgproc.COLOR_BGR2GRAY);
+			Imgproc.threshold(matSrc, graySrc, 254, 255, Imgproc.THRESH_BINARY);
+
+			Imgproc.findContours(graySrc, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+			Log.d("fitCrop[Total_Time]:", " " + (SystemClock.elapsedRealtime() - timeStart));
+
+			if (contours.size() > 50)
+			{
+				exit = true;
+				Log.d("fitCrop[State]:", " Detected");
+			}
+			Log.d("fitCrop[Data][Size]:", "" + contours.size());
+			Log.d("navCount[Count]:", "" + loopCount);
+			loopCount++;
+		}
+		for (int i = 0; i < contours.size(); i++)
+		{
+			double contourArea = Imgproc.contourArea(contours.get(i));
+			MatOfPoint data =  contours.get(i);
+			Log.d("fitCrop[Num]: ", "" + i);
+
+			if(contourArea > 20000)
+			{
+				size = Imgproc.boundingRect(data);
+
+				Log.d("fitCrop[Data][Rect]: ", "X: " + size.x + ", Y: " + + size.y + ", Width: " + size.width + ", Height: " + + size.height);
+				Log.d("fitCrop[Data][Area]: ", "" + contourArea);
+				matSrc = new Mat(matSrc, size);
+				break;
+			}
+		}
+		Bitmap bitmapSrc = Bitmap.createBitmap(size.width, size.height, Bitmap.Config.ARGB_8888);
+		matToBitmap(matSrc, bitmapSrc, false);
+		Log.d("fitCrop[Data][Rect]: ", "Width: " + bitmapSrc.getWidth() + ", Height: " + bitmapSrc.getHeight());
+
+		return bitmapSrc;
+	}
 }
 //                                                                                                                                       lll         lll
 //                                                                                                                                        lll       lll
@@ -512,5 +629,4 @@ public class YourService extends KiboRpcService
 //         lllll       lllll    lllllllllllllll lll      llllll         llllllllllll lll       lll           lll llllllllllll llllllllllll     lll
 //
 //         lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
-
 
