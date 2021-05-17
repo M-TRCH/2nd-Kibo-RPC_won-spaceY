@@ -1,11 +1,11 @@
 [
     {
-        "merged": "C:\\Users\\EARTH\\Google Drive\\Kibo-RPC 2021\\Code\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\layout\\abc_screen_content_include.xml",
-        "source": "C:\\Users\\EARTH\\.android\\build-cache\\50ac73e161a0d36bb4a336743f535f2c5bf3f9c2\\output\\res\\layout\\abc_screen_content_include.xml"
-    },
-    {
         "merged": "C:\\Users\\EARTH\\Google Drive\\Kibo-RPC 2021\\Code\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\layout\\notification_template_part_chronometer.xml",
         "source": "C:\\Users\\EARTH\\.android\\build-cache\\ffb58c8c10b43515261d86446df6d076d514d933\\output\\res\\layout\\notification_template_part_chronometer.xml"
+    },
+    {
+        "merged": "C:\\Users\\EARTH\\Google Drive\\Kibo-RPC 2021\\Code\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\layout\\abc_screen_content_include.xml",
+        "source": "C:\\Users\\EARTH\\.android\\build-cache\\50ac73e161a0d36bb4a336743f535f2c5bf3f9c2\\output\\res\\layout\\abc_screen_content_include.xml"
     },
     {
         "merged": "C:\\Users\\EARTH\\Google Drive\\Kibo-RPC 2021\\Code\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\layout\\abc_select_dialog_material.xml",

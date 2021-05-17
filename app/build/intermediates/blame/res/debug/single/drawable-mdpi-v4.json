@@ -52,12 +52,12 @@
         "source": "C:\\Users\\EARTH\\.android\\build-cache\\50ac73e161a0d36bb4a336743f535f2c5bf3f9c2\\output\\res\\drawable-mdpi-v4\\abc_ic_star_black_36dp.png"
     },
     {
-        "merged": "C:\\Users\\EARTH\\Google Drive\\Kibo-RPC 2021\\Code\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\abc_ic_star_half_black_36dp.png",
-        "source": "C:\\Users\\EARTH\\.android\\build-cache\\50ac73e161a0d36bb4a336743f535f2c5bf3f9c2\\output\\res\\drawable-mdpi-v4\\abc_ic_star_half_black_36dp.png"
-    },
-    {
         "merged": "C:\\Users\\EARTH\\Google Drive\\Kibo-RPC 2021\\Code\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\abc_list_divider_mtrl_alpha.9.png",
         "source": "C:\\Users\\EARTH\\.android\\build-cache\\50ac73e161a0d36bb4a336743f535f2c5bf3f9c2\\output\\res\\drawable-mdpi-v4\\abc_list_divider_mtrl_alpha.9.png"
+    },
+    {
+        "merged": "C:\\Users\\EARTH\\Google Drive\\Kibo-RPC 2021\\Code\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\abc_ic_star_half_black_36dp.png",
+        "source": "C:\\Users\\EARTH\\.android\\build-cache\\50ac73e161a0d36bb4a336743f535f2c5bf3f9c2\\output\\res\\drawable-mdpi-v4\\abc_ic_star_half_black_36dp.png"
     },
     {
         "merged": "C:\\Users\\EARTH\\Google Drive\\Kibo-RPC 2021\\Code\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi-v4\\abc_popup_background_mtrl_mult.9.png",

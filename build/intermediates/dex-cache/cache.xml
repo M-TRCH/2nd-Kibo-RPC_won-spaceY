@@ -12,15 +12,6 @@
     </item>
     <item
         is-multidex="true"
-        jar="C:\Users\EARTH\.android\build-cache\1a686e434cad3f2a61677a74fcf63313bcae3da6\output\jars\classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="26.0.2"
-        sha1="0b723383fcc5c9e6d233f12cf3670c153dcb9f72">
-        <dex dex="C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_acc0310fb864c712b93c37d33ad3c518da0429d8\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
         jar="C:\Users\EARTH\.android\build-cache\2561d8735d90ba4e6b76ff39e28505f35a1ae9fb\output\jars\libs\api-1.0-SNAPSHOT.jar"
         jumboMode="false"
         optimize="true"
@@ -36,6 +27,15 @@
         revision="26.0.2"
         sha1="a572c1afbdb69a1fa3f641c662eade8ed245bc2c">
         <dex dex="C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\build\intermediates\transforms\dex\debug\folders\1000\10\ros-1.0-SNAPSHOT_9a55283b2e4383acec67b8e6c0e8eefcef33bc9f\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\EARTH\.android\build-cache\1a686e434cad3f2a61677a74fcf63313bcae3da6\output\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="26.0.2"
+        sha1="0b723383fcc5c9e6d233f12cf3670c153dcb9f72">
+        <dex dex="C:\Users\EARTH\Google Drive\Kibo-RPC 2021\Code\DefaultApk\app\build\intermediates\transforms\dex\debug\folders\1000\10\classes_acc0310fb864c712b93c37d33ad3c518da0429d8\classes.dex" />
     </item>
     <item
         is-multidex="true"
