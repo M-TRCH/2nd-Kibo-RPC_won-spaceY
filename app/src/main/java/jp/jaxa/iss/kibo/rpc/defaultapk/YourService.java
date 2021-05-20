@@ -24,6 +24,7 @@ import static org.opencv.android.Utils.matToBitmap;
 
 public class YourService extends KiboRpcService
 {
+	Mat srcCom;
 	int Pattern = 0;				// Store pattern value.
 	boolean QRCodeFinish = false,
 			ARCodeFinish = false,
@@ -46,33 +47,30 @@ public class YourService extends KiboRpcService
 	@Override
 	protected void runPlan1()
 	{
-		Log.d("Robot[State]: ", "Starting the mission");
+		/* -> */	Log.i("Robot[State]: ", "Starting the mission");
 		api.startMission();
-		Log.d("Robot[State]: ", "Laser is on");
+		/* -> */	Log.i("Robot[State]: ", "Laser is on");
 		api.laserControl(true);
-		/*				*/
-		PointA_Event();
-		/*				*/
-		moveTo(Point_A.getX(), Point_A.getY(), Point_A.getZ(), Point_Target.getX(), Point_Target.getY(), Point_Target.getZ());
 
-		for(int i=0; i<2; i++)
-		{
-			Log.d("Robot[State]: ", "Aim to target point (" + i + ")");
-			TargetShoot();
-			if(i > 0)	moveTo(Point_A, Quaternion_A2);
-			moveTo(Point_A.getX(), Point_A.getY(), Point_A.getZ(), Point_Target.getX(), Point_Target.getY(), Point_Target.getZ());
-			ARCodeFinish = false;
-		}
 
-		Log.d("Robot[State]: ", "Take a snapshot");
+		/*-------------------------------------*/
+		PointA_Event();	// Include QR Code Event.
+		/*-------------------------------------*/
+
+
+		/* -> */	Log.i("Robot[State]: ", "Aim to target point");
+		getTargetPosition();	TargetShoot();
+
+
+		/* -> */	Log.i("Robot[State]: ", "Take a snapshot");
 		api.takeSnapshot();
-		Log.d("Robot[State]: ", "Move to A-B point");
+		/* -> */	Log.i("Robot[State]: ", "Move to A-B point");
 		moveTo(new Point(10.49, -8.8, 4.645), Quaternion_A);
-		Log.d("Robot[State]: ", "Move to B point");
+		/* -> */	Log.i("Robot[State]: ", "Move to B point");
 		moveTo(Point_B, Quaternion_A);
-		Log.d("Robot[State]: ", "Laser is off");
+		/* -> */	Log.i("Robot[State]: ", "Laser is off");
 		api.laserControl(false);
-		Log.d("Robot[State]: ", "Mission completed");
+		/* -> */	Log.i("Robot[State]: ", "Mission completed");
 		finishMission();
 	}
 	@Override
@@ -80,6 +78,17 @@ public class YourService extends KiboRpcService
 	}
 	@Override
 	protected void runPlan3() {
+	}
+	public void delay(long sleep)
+		/* sleep function */ {
+		try
+		{
+			Thread.sleep(sleep);
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
 	}
 	public void moveTo(Point point, Quaternion quaternion)
 		/* Re-check api.moveTo function is successful or until max number of counter. */ {
@@ -245,7 +254,8 @@ public class YourService extends KiboRpcService
 //		final int originalHeight = 960;    // Original height of Nav Camera.
 //		final int finalWidth = originalWidth - widthCut; // Result width after the process.
 //		final int finalHeight = finalWidth * 3/4;        // Result height after the process.
-		Rect crop = CustomCrop(1280, 960, 480, 150 , 480, 380);
+//		Rect crop = CustomCrop(1280, 960, 480, 150 , 480, 380);
+		Rect crop = CustomCrop(1280, 960, 50, 600, 300, 550);
 
 		/* Set parameter about AR Code. */
 //		Mat IDs = new Mat(); 						// Variable store ID each of AR code. : Matrix format
@@ -268,8 +278,10 @@ public class YourService extends KiboRpcService
 			long timeStart = SystemClock.elapsedRealtime();
 
 			// First step : Movement to point A positionn -> Get image form Nav Camera -> Get realtime position of robot.
-			moveTo(Point_A, Quaternion_A);
-			Mat matSrc = new Mat(api.getMatNavCam(), crop);
+//			moveTo(Point_A, Quaternion_A);
+			TargetShoot();
+			srcCom = api.getMatNavCam();
+			Mat matSrc = new Mat(srcCom, crop);
 			// Kinematics Robot = api.getTrustedRobotKinematics();
 			Log.d("Move&GetImage[State]:", " Finished");
 			Log.d("Move&GetImage[Total_Time]:", " " + (SystemClock.elapsedRealtime() - timeStart));
@@ -489,8 +501,8 @@ public class YourService extends KiboRpcService
 
 		moveTo((float)x_org, (float)y_org, (float)z_org, 0.0f, (float)y, (float)z, (float)w);
 	}
-	public void TargetShoot()
-		/* 	*/ {
+	public void getTargetPosition()
+		/*  */ {
 		/* Set AR parameter */
 		Mat IDs = new Mat(); 						// Variable store ID each of AR code. : Matrix format
 		List<Mat> Corners = new ArrayList<>(); 	// Variable store four corner each of AR Code.
@@ -506,13 +518,15 @@ public class YourService extends KiboRpcService
 		while(!ARCodeFinish && loopCount < loopCountMax)
 		{
 			long timeStartAR = SystemClock.elapsedRealtime();
+			TargetShoot();
+
 			try
 			{
 				Log.d("AR[State]:", " Starting");
 				timeStartAR = SystemClock.elapsedRealtime();
 
-				Mat matSrc1 = api.getMatNavCam();	// , crop1);
-				Aruco.detectMarkers(matSrc1, Dict, Corners, IDs);
+//				Mat matSrc1 = api.getMatNavCam();	// , crop1);
+//				Aruco.detectMarkers(matSrc1, Dict, Corners, IDs);
 				Log.d("AR[First_detect]:", " " + (SystemClock.elapsedRealtime() - timeStartAR));
 
 				long afterFirstAR = SystemClock.elapsedRealtime();
@@ -562,7 +576,7 @@ public class YourService extends KiboRpcService
 						AR_Center[Index][1] = AR_Point[1];			// Return y point of AR tag
 						Log.d("AR[Center]:", " " + Index + ": X = " + AR_Center[Index][0] + " Y = " + AR_Center[Index][1]);
 					}
-					double[] laserPixel = {693, 465};
+					double[] laserPixel = {691, 465};
 //					double[] laserPixel = {393, 214};
 					double[] ctag = Intersection(AR_Center);
 					Log.d("AR[Target Center]:", ": X = " + ctag[0] + " Y = " + ctag[1]);
@@ -603,6 +617,9 @@ public class YourService extends KiboRpcService
 
 					double x_ratio = avg_len_x/0.225;
 					double y_ratio = avg_len_y/0.083;
+					x_ratio *= 1.060896227;
+					y_ratio *= 0.795879035;
+
 
 					Log.d("TargetCal[avg_len_x] = ", "" + avg_len_x);
 					Log.d("TargetCal[avg_len_y] = ", "" + avg_len_y);
@@ -629,7 +646,119 @@ public class YourService extends KiboRpcService
 			loopCount++;
 		}
 	}
-}
+	public void TargetShoot()
+		/*  */ {
+		double [] astro_pos    = {Point_A.getX(), Point_A.getY(), Point_A.getZ()};   		        // input position of Astrobee
+		double [] target_pos   = {Point_Target.getX(), Point_Target.getY(), Point_Target.getZ()};	// input position of target point // -0.09
+
+		double [] laser_shift  = {0.1302, 0.0572, -0.111} ;      // (y,z) constant shift value of laser (from astrobee's  center to laser pointer)
+
+		double [] laser_pos    = {astro_pos[0]+laser_shift[0] , astro_pos[1]+laser_shift[1] , astro_pos[2]+laser_shift[2]} ;              // real cordinate of laser pointer
+		double [] vec_target   = {target_pos[0]-astro_pos[0] , target_pos[1]-astro_pos[1] , target_pos[2]-astro_pos[2] } ;                // vector of astrobee's center to target point (x,y,z)
+		double [] vec_laser    = {laser_pos[0]-astro_pos[0] ,  laser_pos[1]-astro_pos[1] ,  laser_pos[2]-astro_pos[2] } ;                 // vector of astrobee's center to laser pos (x,y,z)
+
+		double val_target     = Math.sqrt((vec_target[0]*vec_target[0])+(vec_target[1]*vec_target[1])+(vec_target[2]*vec_target[2]));     // Lenght of astrobee's center to target point
+		double [] unit_target = {vec_target [0]/val_target , vec_target[1]/val_target , vec_target[2]/val_target} ;                       // unit vector of vec_target
+
+		double r_laser = 0.1804 ;             // constant lenght of center of Astrobee to laser (r = sqrt(x^2+Y^2+z^2))
+		double las_angle = 136.11699 *0.01745 ;   // constant angle btween r_laser and laser vector (radius) (theta = cos^-1((c^2-a^2-b^2)/2*a*b))
+
+		///*****start with calculate the lenght of laser to targetpoint (using cosine's law and root of equation)***///
+		///*==> c^2 = a^2+b^2-2abcos(theta) , x = -b+-sqrt(b^2-2ac)/2a<==*///
+
+		double[] cons_l = {1 , -2*r_laser*Math.cos(las_angle) , (r_laser*r_laser)-(val_target*val_target) } ;                                                                                    //=
+
+		double[] laser_root = {(-cons_l[1] + Math.sqrt((cons_l[1]*cons_l[1])-(4*cons_l[0]*cons_l[2])))/(2*cons_l[0]),
+								(-cons_l[1] - Math.sqrt((cons_l[1]*cons_l[1])-(4*cons_l[0]*cons_l[2])))/(2*cons_l[0])  } ;
+
+		double val_laser;                                                                                      // a variable to contain laser's lenght
+
+		if    (laser_root[0] > 0){val_laser = laser_root[0] ;}                                                  // check the root, the lenght can't lees than 0
+		else  {val_laser = laser_root[1];}                                                                      // <=== laser lenght is contain in "val_laser"
+
+		///*****calculate the angle between vec_laser & vec_target  (using cosine's law)***///
+		///*==> c^2 = a^2+b^2-2abcos(theta)<==*///
+
+		//   double constant = (val_target*val_target)+(r_laser*r_laser)-(val_laser*val_laser) ;
+		//   double det = 2*r_laser*val_laser ;
+
+		double las_theta = Math.acos(((val_laser*val_laser)-(val_target*val_target)-(r_laser*r_laser))/(-2*r_laser*val_target));      // just a theta....
+		double r_circle      = r_laser*Math.sin (las_theta);                                                                          // it a bit complicate....
+		double lenght_target = r_laser*Math.cos (las_theta);                                                                          // this too....
+
+		// imagination is improtant than the knowledge!
+
+		double [] circle_pos = { unit_target[0]*lenght_target , unit_target[1]*lenght_target , unit_target[2]*lenght_target } ;       // center of the laser'circle
+
+		/// the most fucking thing of this program!! beware the confusion, I mean.... I'm the one who confuse So, i told my self to be care ///
+		///calculate the position of laser pointer!///
+
+		double beta = 0 ;
+
+		double d = (unit_target[0]*circle_pos[0])+(unit_target[1]*circle_pos[1])+(unit_target[2]*circle_pos[2]) ;
+		double e = ((Math.tan(beta)*unit_target[0])-circle_pos[2])/unit_target[1];
+		double f = (d-(unit_target[0]*circle_pos[0])-(unit_target[0]*Math.tan(beta)*circle_pos[2]))/unit_target[1];
+		double g = circle_pos[0]+(Math.tan(beta)*circle_pos[2]);
+
+		double[] cons_r = { 1+(Math.tan(beta)*Math.tan(beta))+(e*e),
+				(2*e*f)-(2*g*Math.tan(beta)) ,
+				(g*g)+(f*f)-(r_laser*r_laser)} ;
+
+		double[] z_root = {(-cons_r[1] + Math.sqrt((cons_r[1]*cons_r[1])-(4*cons_r[0]*cons_r[2])))/(2*cons_r[0]) ,                              // root of laser point's z position
+				(-cons_r[1] - Math.sqrt((cons_r[1]*cons_r[1])-(4*cons_r[0]*cons_r[2])))/(2*cons_r[0])  } ;                          // because position that laser pointer can iluminate the light to targerpoint is in circle function So, there are two position in eatch perpendicular plane.
+
+		double z_laser ;
+		if (z_root[0] < z_root[1]) {z_laser  = z_root[0] ;}  // Choosh the nearest position by compair the two root and choose the less value
+		else {z_laser  = z_root[1] ;}                        // because the position a of laserpointer is minus so the less position z is the nearest they are. (Sorry, for my bad english...)
+
+		double y_laser = (z_laser*e)+f ;
+
+		double x_laser = circle_pos[0]+(Math.tan(beta)*(unit_target[2]-z_laser));
+
+		double check = Math.sqrt((z_laser*z_laser)+(y_laser*y_laser)+(x_laser*x_laser));
+
+		if (check != r_laser){System.out.println("false" + check);}
+		else {System.out.println("finaly success " + check);}
+
+		double check_l = Math.sqrt(((x_laser-circle_pos[0])*(x_laser-circle_pos[0]))+((y_laser-circle_pos[1])*(y_laser-circle_pos[1]))+((z_laser-circle_pos[2])*(z_laser-circle_pos[2])));
+
+		double check_val = Math.sqrt(((z_laser-vec_target[2])*(z_laser-vec_target[2]))+((y_laser-vec_target[1])*(y_laser-vec_target[1]))+((x_laser-vec_target[0])*(x_laser-vec_target[0])));
+
+		double true_val = (check_val+val_laser)/2 ;
+
+		double [] vec_new = {Math.sqrt((val_target*val_target)-(laser_shift[1]*laser_shift[1])-(laser_shift[2]*laser_shift[2])), laser_shift[1] , laser_shift[2] } ;
+
+		double [] unit_new = {vec_new[0]/val_target , vec_new[1]/val_target , vec_new[2]/val_target} ;
+
+//		vec_target   = new double [] {target_pos[0]-astro_pos[0], target_pos[1]-astro_pos[1]-0.089137964, target_pos[2]-astro_pos[2]-0.046320622} ;
+//		val_target   = Math.sqrt((vec_target[0]*vec_target[0])+(vec_target[1]*vec_target[1])+(vec_target[2]*vec_target[2]));
+//		unit_target  = new double [] {vec_target [0]/val_target , vec_target[1]/val_target , vec_target[2]/val_target} ;
+
+		/* quaternion position calculation by rotation axis theory */
+		double [] vec_normal = {(unit_new[1]*unit_target[2])-(unit_new[2]*unit_target[1]) ,
+				(unit_new[2]*unit_target[0])-(unit_new[0]*unit_target[2]) ,
+				(unit_new[0]*unit_target[1])-(unit_new[1]*unit_target[0])};
+
+		double val_normal = Math.sqrt((vec_normal[0]*vec_normal[0])+(vec_normal[1]*vec_normal[1])+(vec_normal[2]*vec_normal[2]));
+
+		double [] unit_normal = {vec_normal[0]/val_normal , vec_normal[1]/val_normal , vec_normal[2]/val_normal};
+
+		double [] vec_imagin = {unit_target[0]-unit_new[0],unit_target[1]-unit_new[1],unit_target[2]-unit_new[2]};
+
+		double val_imagin = Math.sqrt((vec_imagin[0]*vec_imagin[0])+(vec_imagin[1]*vec_imagin[1])+(vec_imagin[2]*vec_imagin[2])) ;
+
+		double omega = Math.acos(1-(val_imagin*val_imagin/2));
+
+		double [] Qua = {Math.cos(omega/2),
+				Math.sin(omega/2)*unit_normal[0] ,
+				Math.sin(omega/2)*unit_normal[1] ,
+				Math.sin(omega/2)*unit_normal[2] }; // position is contain in (w,a,b,c)
+
+		Log.d("FinalQuaternion = ", "w: " + Qua[0] + ", a: " + Qua[1] + ", b: " + Qua[2] +", c: " + Qua[3]);
+		moveTo(Point_A, new Quaternion((float)Qua[1], (float)Qua[2], (float)Qua[3], (float)Qua[0]));
+	}
+}	/* Score: 76.87, 78.01, 66.26, 74.18, 74.51, 77.66, 76.13, 73.87, 77.65, 76.11, 74.55, 74.82, 75.93, 79.88, 73.32, 77.20 */
+	/*		   1/1    1/2    2/1    2/2    3/1    3/2    4/1	  4/2	 5/1    5/2    6/1    6/2    7/1    7/2    8/1    8/2  */
 //                                                                                                                                       lll         lll
 //                                                                                                                                        lll       lll
 //		lll      lllll      lll lllllllllllllll llllll      lll         llllllllllll llllllllllll    lllll       llllllllllll llllllllllll lll     lll
