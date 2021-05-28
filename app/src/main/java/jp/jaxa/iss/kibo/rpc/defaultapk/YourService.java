@@ -10,9 +10,13 @@ import net.sourceforge.zbar.Symbol;
 import net.sourceforge.zbar.SymbolSet;
 import org.opencv.aruco.Aruco;
 import org.opencv.aruco.Dictionary;
+import org.opencv.calib3d.Calib3d;
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,14 +39,13 @@ public class YourService extends KiboRpcService
 	final Point Point_A = new Point(11.21, -9.8, 4.79);	//	Point of A
 	final Point Point_B = new Point(10.6, -8.0, 4.5);		//	Point of B
 	Point Point_A_Prime = new Point(0, 0, 0);				//	Point of A prime
-	//	Point Point_Target = new Point(0, -10.585, 0);		//	Point of Target
-	Point Point_Target = new Point(11.219, -10.585, 5.603);
+	Point Point_Target = new Point(11.219, -10.585, 5.603);	//	Default Point of Target.
 //	Point Point_Shift1 = new Point(-0.16966, 0, -0.02683);	//	Laser distance shift (1: AR Intersection Method).
 //	Point Point_Shift2 = new Point(-0.17266, 0, -0.13983);	//	Laser distance shift (2: AR Average Method).
 //	Point Point_Shift3 = new Point(-0.17866, 0, -0.13483);	//	Laser distance shift (3: HC Average Method).
 //	Point Point_Shift4 = new Point(-0.018, 0, -0.037);		//	Laser distance shift (4: AR Rotate Method).
-	Point Point_Shift4 = new Point(0, 0, 0);		//	Laser distance shift (4: AR Rotate Method).
-	Point NavCam_Shift = new Point(-0.0422, 0, -0.0826);
+//	Point Point_Shift4 = new Point(0, 0, 0);		//	Laser distance shift (4: AR Rotate Method).
+//	Point NavCam_Shift = new Point(-0.0422, 0, -0.0826);
 
 	@Override
 	protected void runPlan1()
@@ -51,17 +54,10 @@ public class YourService extends KiboRpcService
 		api.startMission();
 		/* -> */	Log.i("Robot[State]: ", "Laser is on");
 		api.laserControl(true);
-
-
-		/*-------------------------------------*/
-		PointA_Event();	// Include QR Code Event.
-		/*-------------------------------------*/
-
-
+		/* -> */	Log.i("Robot[State]: ", "QR Code scanning");
+		QR_Event();
 		/* -> */	Log.i("Robot[State]: ", "Aim to target point");
 		getTargetPosition();	TargetShoot();
-
-
 		/* -> */	Log.i("Robot[State]: ", "Take a snapshot");
 		api.takeSnapshot();
 		/* -> */	Log.i("Robot[State]: ", "Move to A-B point");
@@ -168,11 +164,11 @@ public class YourService extends KiboRpcService
 
 		// Set matrix parameter from Array.
 		final double[] cameraMatrixList =
-				{
-						567.229305D,    0.00000D, 659.077221D,
-						0.0000D, 574.192915D, 517.007571D,
-						0.0000D,    0.00000D,       1.00D
-				};
+		{
+				567.229305D,    0.00000D, 659.077221D,
+				0.0000D, 574.192915D, 517.007571D,
+				0.0000D,    0.00000D,       1.00D
+		};
 		final double[] dCoefficientList = {-0.216247D, 0.03875D, -0.010157D, 0.001969D, 0.0D};
 		cameraMatrix.put(row, col, cameraMatrixList);
 		dCoefficient.put(row, col, dCoefficientList);
@@ -246,7 +242,7 @@ public class YourService extends KiboRpcService
 		y_avg /= 4;
 		return new double[]{x_avg, y_avg};
 	}
-	public void PointA_Event()
+	public void QR_Event()
 		/* All events that take position at the point of A include QR Code Reading, AR Code Reading and Target position analyzing. */ {
 		/* Set parameter related to image from navigation camera. */
 //		final int widthCut = 840;			// Width you need cut off.
@@ -279,9 +275,8 @@ public class YourService extends KiboRpcService
 
 			// First step : Movement to point A positionn -> Get image form Nav Camera -> Get realtime position of robot.
 //			moveTo(Point_A, Quaternion_A);
-			TargetShoot();
-			srcCom = api.getMatNavCam();
-			Mat matSrc = new Mat(srcCom, crop);
+			TargetShoot();	// move to default target point
+			Mat matSrc = new Mat(api.getMatNavCam(), crop);
 			// Kinematics Robot = api.getTrustedRobotKinematics();
 			Log.d("Move&GetImage[State]:", " Finished");
 			Log.d("Move&GetImage[Total_Time]:", " " + (SystemClock.elapsedRealtime() - timeStart));
@@ -501,8 +496,24 @@ public class YourService extends KiboRpcService
 
 		moveTo((float)x_org, (float)y_org, (float)z_org, 0.0f, (float)y, (float)z, (float)w);
 	}
+	public double[] SrcPointTransformToHomoPoint(Mat H, double[] pt)
+		/* Position tranformation form source image to homography image */ {
+		/* Input ; 3x3 Mat -> Homography constant, 2 double in array -> point x and point y */
+		Mat pt1 = new Mat(3, 1, CvType.CV_64FC1);
+		Mat	pt2 = new Mat();
+		pt1.put(0, 0, pt[0], pt[1], 1);
+
+		Core.gemm(H, pt1, 1, new Mat(), 0, pt2);
+
+		double[] data = pt2.get(2, 0);
+		Core.divide(pt2, new Scalar(data[0]), pt2);
+
+		double[] data1 = pt2.get(0, 0);
+		double[] data2 = pt2.get(1, 0);
+		return new double[]{data1[0], data2[0]};
+	}
 	public void getTargetPosition()
-		/*  */ {
+		/* Compute the coordinates of the target position transformed by the homography. */ {
 		/* Set AR parameter */
 		Mat IDs = new Mat(); 						// Variable store ID each of AR code. : Matrix format
 		List<Mat> Corners = new ArrayList<>(); 	// Variable store four corner each of AR Code.
@@ -510,31 +521,32 @@ public class YourService extends KiboRpcService
 		int[] AR_ID = new int[]{0, 0, 0, 0};		// Variable store ID each of AR code. : Array of Int format
 		double[][] AR_Center = new double[4][2]; 	// Variable store center each of AR tag.
 		/* Set general parameter */
-		Rect crop1 = CustomCrop(1280, 960, 680, 0, 400, 420);
-		Rect crop2 = CustomCrop(1280, 960, 250, 250, 300, 400);
+		Rect crop = CustomCrop(1280, 960, 210, 330, 405, 455);
 		int loopCount = 0; 				// Variable of loop counter.
 		final int loopCountMax = 5;		// Variable of max loop count.
+		/* Target tag variables */
+		int[] 	ArID1_CornerRT = new int[]{0, 0},	// Container the specified corner of the ar tag.
+				ArID2_CornerLT = new int[]{0, 0},
+				ArID3_CornerLB = new int[]{0, 0},
+				ArID4_CornerRB = new int[]{0, 0};
+		int virtualWidth = 275;		//	Virtual width of AR tag. 	//	Reference ratio from the real tag
+		int virtualHeight = 133;	//	Virtual height of AR tag.	//	in meter unit.
+		int offsetX = 100;			// 	Origin shifting for warp process.
+		int offsetY = 100;			//	..
+		MatOfPoint2f 	corners1 = new MatOfPoint2f(),	//	Use contain input corners of the image A.
+						corners2 = new MatOfPoint2f();	//	Use contain output corners of the image B.
+		Mat H = new Mat();	// Constant variables of Homography.
 
 		while(!ARCodeFinish && loopCount < loopCountMax)
 		{
-			long timeStartAR = SystemClock.elapsedRealtime();
-			TargetShoot();
+			Log.d("AR[State]:", " Starting");
+			long timeStartAR = SystemClock.elapsedRealtime();	// Start timer
+			TargetShoot();										// Rotate to target point again.
+			Mat matSrc = new Mat(api.getMatNavCam(), crop);	// Get matrix image.
 
 			try
 			{
-				Log.d("AR[State]:", " Starting");
-				timeStartAR = SystemClock.elapsedRealtime();
-
-//				Mat matSrc1 = api.getMatNavCam();	// , crop1);
-//				Aruco.detectMarkers(matSrc1, Dict, Corners, IDs);
-				Log.d("AR[First_detect]:", " " + (SystemClock.elapsedRealtime() - timeStartAR));
-
-				long afterFirstAR = SystemClock.elapsedRealtime();
-
-				Mat matSrc2 = api.getMatNavCam();	// , crop2);
-				Aruco.detectMarkers(matSrc2, Dict, Corners, IDs); 	// AR tag detector
-				Log.d("AR[Second_detect]:", " " + (SystemClock.elapsedRealtime() - afterFirstAR));
-
+				Aruco.detectMarkers(matSrc, Dict, Corners, IDs); 	// AR tag detector
 				AR_ID = new int[] 									// Put ID of AR Code to Array of int.
 				{
 					(int) IDs.get(0, 0)[0],
@@ -543,6 +555,7 @@ public class YourService extends KiboRpcService
 					(int) IDs.get(3, 0)[0]
 				};
 				Log.d("AR[State]:", " Detected");
+				Log.d("AR[Total_Time]:", " " + (SystemClock.elapsedRealtime() - timeStartAR) / 1000);
 			}
 			catch (Exception error)
 			{
@@ -559,95 +572,134 @@ public class YourService extends KiboRpcService
 					for (int i = 0; i < 4; i++)
 					{
 						double[][] Corner =		// Put each AR tag corners to 2d-array of double.
-						{
-							{(int) Corners.get(i).get(0, 0)[0], (int) Corners.get(i).get(0, 0)[1]},
-							{(int) Corners.get(i).get(0, 2)[0], (int) Corners.get(i).get(0, 2)[1]},
-							{(int) Corners.get(i).get(0, 1)[0], (int) Corners.get(i).get(0, 1)[1]},
-							{(int) Corners.get(i).get(0, 3)[0], (int) Corners.get(i).get(0, 3)[1]}
+						{						// Return variables sorted clockwise starting from left-top corner.
+							{(int) Corners.get(i).get(0, 0)[0], (int) Corners.get(i).get(0, 0)[1]},		// Left-top
+							{(int) Corners.get(i).get(0, 2)[0], (int) Corners.get(i).get(0, 2)[1]},		// Right-bottom
+							{(int) Corners.get(i).get(0, 1)[0], (int) Corners.get(i).get(0, 1)[1]},		// Right-top
+							{(int) Corners.get(i).get(0, 3)[0], (int) Corners.get(i).get(0, 3)[1]}		// Left-bottom
 						};
-						/* Intersection Method */
-						double[] AR_Point = Intersection(Corner); 	// Calculate center of AR tag.
-						int Index = -1;								// Set initial index
-							 if (AR_ID[i] == 1) Index = 0;			// Origin coordinate of Line 1
-						else if (AR_ID[i] == 2) Index = 2;			// Origin coordinate of Line 2
-						else if (AR_ID[i] == 3) Index = 1;			// Final coordinate of Line 1
-						else if (AR_ID[i] == 4) Index = 3;			// Final coordinate of Line 2
-						AR_Center[Index][0] = AR_Point[0];			// Return x point of AR tag
-						AR_Center[Index][1] = AR_Point[1];			// Return y point of AR tag
-						Log.d("AR[Center]:", " " + Index + ": X = " + AR_Center[Index][0] + " Y = " + AR_Center[Index][1]);
+						for(int j=0; j<4; j++)	// Log corner of ar tag.
+							Log.d("AR_Corner[" + i + "][" + j + "]:", " X= " + Corner[j][0] + ", Y= " + Corner[j][1]);
+
+						/* Set the corner to match the id of ar code. */
+							 if (AR_ID[i] == 1){ ArID1_CornerRT[0] = (int) Corner[2][0]; ArID1_CornerRT[1] = (int) Corner[2][1]; }
+						else if (AR_ID[i] == 2){ ArID2_CornerLT[0] = (int) Corner[0][0]; ArID2_CornerLT[1] = (int) Corner[0][1]; }
+						else if (AR_ID[i] == 3){ ArID3_CornerLB[0] = (int) Corner[3][0]; ArID3_CornerLB[1] = (int) Corner[3][1]; }
+						else if (AR_ID[i] == 4){ ArID4_CornerRB[0] = (int) Corner[1][0]; ArID4_CornerRB[1] = (int) Corner[1][1]; }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//						/* Intersection Method */
+//						double[] AR_Point = Intersection(Corner); 	// Calculate center of AR tag.
+//						int Index = -1;								// Set initial index
+//							 if (AR_ID[i] == 1) Index = 0;			// Origin coordinate of Line 1
+//						else if (AR_ID[i] == 2) Index = 2;			// Origin coordinate of Line 2
+//						else if (AR_ID[i] == 3) Index = 1;			// Final coordinate of Line 1
+//						else if (AR_ID[i] == 4) Index = 3;			// Final coordinate of Line 2
+//						AR_Center[Index][0] = AR_Point[0];			// Return x point of AR tag
+//						AR_Center[Index][1] = AR_Point[1];			// Return y point of AR tag
+//						Log.d("AR[Center]:", " " + Index + ": X = " + AR_Center[Index][0] + " Y = " + AR_Center[Index][1]);
 					}
-					double[] laserPixel = {691, 465};
-//					double[] laserPixel = {393, 214};
-					double[] ctag = Intersection(AR_Center);
-					Log.d("AR[Target Center]:", ": X = " + ctag[0] + " Y = " + ctag[1]);
-					double dx1 = (AR_Center[0][0] - AR_Center[2][0]);
-					double dy1 = (AR_Center[0][1] - AR_Center[2][1]);
-					double a1 = Math.atan2(dy1, dx1);
-
-					double dx2 = (AR_Center[3][0] - AR_Center[1][0]);
-					double dy2 = (AR_Center[3][1] - AR_Center[1][1]);
-					double a2 = Math.atan2(dy2, dx2);
-
-					double at = (a1 + a2) / 2;
-
-					double x_diff = laserPixel[0] - ctag[0];
-					double y_diff = laserPixel[1] - ctag[1];
-					double a3 = Math.atan2(y_diff, x_diff);
-					double r3 = Math.sqrt(Math.pow(x_diff, 2) + Math.pow(y_diff, 2));
-
-					double xp = Math.cos(a3-at)*r3;
-					double yp = Math.sin(a3-at)*r3;
-
-					at = Math.toDegrees(at);
-					a3 = Math.toDegrees(a3);
-
-
-					/**/
-					double dx3 = (AR_Center[3][0] - AR_Center[0][0]);
-					double dy3 = (AR_Center[3][1] - AR_Center[0][1]);
-					double dx4 = (AR_Center[1][0] - AR_Center[2][0]);
-					double dy4 = (AR_Center[1][1] - AR_Center[2][1]);
-
-					double len_x1 = Math.sqrt(Math.pow(dx1, 2)+Math.pow(dy1, 2));
-					double len_x2 = Math.sqrt(Math.pow(dx2, 2)+Math.pow(dy2, 2));
-					double avg_len_x = (len_x1+len_x2)/2;
-					double len_y1 = Math.sqrt(Math.pow(dx3, 2)+Math.pow(dy3, 2));
-					double len_y2 = Math.sqrt(Math.pow(dx4, 2)+Math.pow(dy4, 2));
-					double avg_len_y = (len_y1+len_y2)/2;
-
-					double x_ratio = avg_len_x/0.225;
-					double y_ratio = avg_len_y/0.083;
-					x_ratio *= 1.060896227;
-					y_ratio *= 0.795879035;
-
-
-					Log.d("TargetCal[avg_len_x] = ", "" + avg_len_x);
-					Log.d("TargetCal[avg_len_y] = ", "" + avg_len_y);
-					Log.d("TargetCal[x_ratio] = ", "" + x_ratio);
-					Log.d("TargetCal[y_ratio] = ", "" + y_ratio);
+//					double[] laserPixel = {285, 255};
+//					double[] ctag = Intersection(AR_Center);
+//					Log.d("AR[Target Center]:", ": X = " + ctag[0] + " Y = " + ctag[1]);
+//					double dx1 = (AR_Center[0][0] - AR_Center[2][0]);
+//					double dy1 = (AR_Center[0][1] - AR_Center[2][1]);
+//					double a1 = Math.atan2(dy1, dx1);
+//
+//					double dx2 = (AR_Center[3][0] - AR_Center[1][0]);
+//					double dy2 = (AR_Center[3][1] - AR_Center[1][1]);
+//					double a2 = Math.atan2(dy2, dx2);
+//
+//					double at = (a1 + a2) / 2;
+//
+//					double x_diff = laserPixel[0] - ctag[0];
+//					double y_diff = laserPixel[1] - ctag[1];
+//					double a3 = Math.atan2(y_diff, x_diff);
+//					double r3 = Math.sqrt(Math.pow(x_diff, 2) + Math.pow(y_diff, 2));
+//
+//					double xp = Math.cos(a3-at)*r3;
+//					double yp = Math.sin(a3-at)*r3;
+//
+//					at = Math.toDegrees(at);
+//					a3 = Math.toDegrees(a3);
+//
+//					double dx3 = (AR_Center[3][0] - AR_Center[0][0]);
+//					double dy3 = (AR_Center[3][1] - AR_Center[0][1]);
+//					double dx4 = (AR_Center[1][0] - AR_Center[2][0]);
+//					double dy4 = (AR_Center[1][1] - AR_Center[2][1]);
+//
+//					double len_x1 = Math.sqrt(Math.pow(dx1, 2)+Math.pow(dy1, 2));
+//					double len_x2 = Math.sqrt(Math.pow(dx2, 2)+Math.pow(dy2, 2));
+//					double avg_len_x = (len_x1+len_x2)/2;
+//					double len_y1 = Math.sqrt(Math.pow(dx3, 2)+Math.pow(dy3, 2));
+//					double len_y2 = Math.sqrt(Math.pow(dx4, 2)+Math.pow(dy4, 2));
+//					double avg_len_y = (len_y1+len_y2)/2;
+//
+//					double x_ratio = avg_len_x/0.225;
+//					double y_ratio = avg_len_y/0.083;
+//					x_ratio *= 1.044219704;
+//					y_ratio *= 0.80656968;
+//
+//					Log.d("TargetCal[avg_len_x] = ", "" + avg_len_x);
+//					Log.d("TargetCal[avg_len_y] = ", "" + avg_len_y);
+//					Log.d("TargetCal[x_ratio] = ", "" + x_ratio);
+//					Log.d("TargetCal[y_ratio] = ", "" + y_ratio);
 
 //					double PixelToMeter = 533.333333333;	// Constant ratio by won-spaceY.
-					double X_dif = xp / x_ratio;			// The x-axis distance between the robot and the target : meter unit
-					double Y_dif = yp / y_ratio;			// The y-axis distance between the robot and the target : meter unit
 
-					Point_Target = new Point(	Point_Target.getX() - X_dif + Point_Shift4.getX(),
-												Point_Target.getY() + Point_Shift4.getY(),
-												Point_Target.getZ() - Y_dif + Point_Shift4.getZ());	// Calculate target position on ISS
+//					Log.d("TargetCal[Data][Dif]:", " Xp: " + xp + ", Yp: " + yp);
+//					double X_dif = xp / x_ratio;			// The x-axis distance between the robot and the target : meter unit
+//					double Y_dif = yp / y_ratio;			// The y-axis distance between the robot and the target : meter unit
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+					org.opencv.core.Point cornerIN[] =		// Set input corners with four AR tag.
+					{
+						new org.opencv.core.Point(ArID1_CornerRT[0], ArID1_CornerRT[1]),
+						new org.opencv.core.Point(ArID2_CornerLT[0], ArID2_CornerLT[1]),
+						new org.opencv.core.Point(ArID3_CornerLB[0], ArID3_CornerLB[1]),
+						new org.opencv.core.Point(ArID4_CornerRB[0], ArID4_CornerRB[1])
+					};
+					Log.d("ARCorner(ID1)", " X= " + ArID1_CornerRT[0] + ", Y= " + ArID1_CornerRT[1]);
+					Log.d("ARCorner(ID2)", " X= " + ArID2_CornerLT[0] + ", Y= " + ArID2_CornerLT[1]);
+					Log.d("ARCorner(ID3)", " X= " + ArID3_CornerLB[0] + ", Y= " + ArID3_CornerLB[1]);
+					Log.d("ARCorner(ID4)", " X= " + ArID4_CornerRB[0] + ", Y= " + ArID4_CornerRB[1]);
+
+					org.opencv.core.Point cornerOut[] =		// Set output corners with actual ratio of AR tag.
+					{
+						new org.opencv.core.Point(virtualWidth + offsetX, 0 + offsetY),
+						new org.opencv.core.Point(0 + offsetX, 0 + offsetY),
+						new org.opencv.core.Point(0 + offsetX, virtualHeight + offsetY),
+						new org.opencv.core.Point(virtualWidth + offsetX, virtualHeight + offsetY)
+					};
+					corners1.fromArray(cornerIN);	// input array into matrix of point variable.
+					corners2.fromArray(cornerOut);	// ..
+					H = Calib3d.findHomography(corners1, corners2);	// Calculate constant variables of Homography.
+					Log.d("Homography=", " " + H.dump());
+
+					double[] laserCenterSrc = {285, 255};													// Center of laser pointer on image. (Constant point)
+					double[] TargetCenterHomo = {offsetX+(virtualWidth/2), offsetY+(virtualHeight/2)};	// Center of Tatget tag on homo image. (Constant point)
+					double[] laserCenterHomo = SrcPointTransformToHomoPoint(H, laserCenterSrc);			// Get laser position on homography image.
+					double X_dif = (laserCenterHomo[0] - TargetCenterHomo[0]) / 1000;						// The x-axis distance between the robot and the target : meter unit
+					double Y_dif = (laserCenterHomo[1] - TargetCenterHomo[1]) / 1000;						// The y-axis distance between the robot and the target : meter unit
+
+					Point_Target = new Point(	Point_Target.getX() - X_dif + 0,
+												Point_Target.getY() + 0,
+												Point_Target.getZ() - Y_dif + 0);	// Calculate target position on ISS
 
 					/* Data Logger */
-					Log.d("TargetCal[Data][angle]:", " at: " + at + ", a3: " + a3);
+//					Log.d("TargetCal[Data][angle]:", " at: " + at + ", a3: " + a3);
 					Log.d("TargetCal[Data][Dif]:", " X: " + X_dif + ", Y: " + Y_dif);
 					Log.d("TargetCal[Data][Point]:", " X: " + Point_Target.getX() + ", Y: " + Point_Target.getY() + ", Z: " + Point_Target.getZ());
 					Log.d("TargetCal[Total_Time]:", " " + (SystemClock.elapsedRealtime() - timeStart2));
 					ARCodeFinish = true; // Set new condition.
 				}
-				Log.d("AR[Total_Time]:", " " + (SystemClock.elapsedRealtime() - timeStartAR) / 1000);
+				Log.d("AR+Cal[Total_Time]:", " " + (SystemClock.elapsedRealtime() - timeStartAR) / 1000);
 			}
 			loopCount++;
 		}
 	}
 	public void TargetShoot()
-		/*  */ {
+		/* Similar to the moveTo six variables but between is vector ends are pointed by a laser pointer not center of robot. */ {
 		double [] astro_pos    = {Point_A.getX(), Point_A.getY(), Point_A.getZ()};   		        // input position of Astrobee
 		double [] target_pos   = {Point_Target.getX(), Point_Target.getY(), Point_Target.getZ()};	// input position of target point // -0.09
 
@@ -757,16 +809,13 @@ public class YourService extends KiboRpcService
 		Log.d("FinalQuaternion = ", "w: " + Qua[0] + ", a: " + Qua[1] + ", b: " + Qua[2] +", c: " + Qua[3]);
 		moveTo(Point_A, new Quaternion((float)Qua[1], (float)Qua[2], (float)Qua[3], (float)Qua[0]));
 	}
-}	/* Score: 76.87, 78.01, 66.26, 74.18, 74.51, 77.66, 76.13, 73.87, 77.65, 76.11, 74.55, 74.82, 75.93, 79.88, 73.32, 77.20 */
-	/*		   1/1    1/2    2/1    2/2    3/1    3/2    4/1	  4/2	 5/1    5/2    6/1    6/2    7/1    7/2    8/1    8/2  */
+}	/* Average score in 50 times: 76.97 */
 //                                                                                                                                       lll         lll
 //                                                                                                                                        lll       lll
-//		lll      lllll      lll lllllllllllllll llllll      lll         llllllllllll llllllllllll    lllll       llllllllllll llllllllllll lll     lll
-//		lll     lll lll     lll lll         lll lll lll     lll         lll          lll      lll   lll lll      lll          lll           lll   lll
+//      lll      lllll      lll lllllllllllllll llllll      lll         llllllllllll llllllllllll    lllll       llllllllllll llllllllllll lll     lll
+//      lll     lll lll     lll lll         lll lll lll     lll         lll          lll      lll   lll lll      lll          lll           lll   lll
 //       lll   lll   lll   lll  lll         lll lll  lll    lll         lll          lll      lll  lll   lll     lll          lll            lll lll
 //       lll   lll   lll   lll  lll         lll lll   lll   lll lllllll llllllllllll llllllllllll lllllllllll    lll          llllllllllll    lllll
 //        lll lll     lll lll   lll         lll lll    lll  lll                  lll lll         lll       lll   lll          lll              lll
 //        lll lll     lll lll   lll         lll lll     lll lll                  lll lll        lll         lll  lll          lll              lll
 //         lllll       lllll    lllllllllllllll lll      llllll         llllllllllll lll       lll           lll llllllllllll llllllllllll     lll
-//
-//         lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
