@@ -2,7 +2,11 @@
   <dictionary name="Teerachot">
     <words>
       <w>coeffs</w>
+      <w>homography</w>
       <w>quafrom</w>
+      <w>siraphop</w>
+      <w>teerachot</w>
+      <w>tula</w>
     </words>
   </dictionary>
 </component>
